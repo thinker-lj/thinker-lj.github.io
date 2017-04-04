@@ -1,0 +1,7 @@
+hexo/.DS_Store
+hexo/Thumbs.db
+hexo/db.json
+hexo/*.log
+hexo/node_modules/
+hexo/public/
+hexo/.deploy*/
