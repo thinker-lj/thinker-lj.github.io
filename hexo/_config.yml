@@ -86,7 +86,7 @@ avatar: /images/logo.png
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/thinker-lj/thinker-lj.github.io.git
+  repo: git@github.com:thinker-lj/thinker-lj.github.io.git
   branch: master
 
 disqus_shortname: thinker-lj
