@@ -1,0 +1,661 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="git,项目管理,敏捷," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="软件就像性，免费的比花钱的好得多…  —— 李纳斯·托沃兹   &amp;amp; 引子网络时代，随便找个地方，不等Git三个字母敲完，资料就出来了。所以，这篇只聊个人观点，项目实战后的感悟。不喜，随意喷！对朋友，我骂人比谁都脏……  &amp;amp; 从SVN谈起：提到版本控制系统，首先要聊两句更纯粹些的SVN，之所以说它纯粹，是因为这种集中式的数据仓库更符合常规思维，它只提供一种途径，这样每个人都使用着">
+<meta name="keywords" content="git,项目管理,敏捷">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用更加优雅的方式做事：Git Flow">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;git-flow&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="软件就像性，免费的比花钱的好得多…  —— 李纳斯·托沃兹   &amp;amp; 引子网络时代，随便找个地方，不等Git三个字母敲完，资料就出来了。所以，这篇只聊个人观点，项目实战后的感悟。不喜，随意喷！对朋友，我骂人比谁都脏……  &amp;amp; 从SVN谈起：提到版本控制系统，首先要聊两句更纯粹些的SVN，之所以说它纯粹，是因为这种集中式的数据仓库更符合常规思维，它只提供一种途径，这样每个人都使用着">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;gitflow_p0.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;gitflow_p1.png">
+<meta property="og:updated_time" content="2017-02-04T14:55:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;gitflow_p0.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/git-flow/"/>
+
+
+  <title> 用更加优雅的方式做事：Git Flow | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                用更加优雅的方式做事：Git Flow
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-02-11T15:33:50+08:00" content="2016-02-11">
+              2016-02-11
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE%E6%97%A5%E5%B8%B8/" itemprop="url" rel="index">
+                    <span itemprop="name">项目日常</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/git-flow/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="git-flow/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/gitflow_p0.jpg" alt=""></p>
+<blockquote>
+<p>软件就像性，免费的比花钱的好得多…</p>
+</blockquote>
+<p align="right">—— 李纳斯·托沃兹</p>
+
+<hr>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p>网络时代，随便找个地方，不等Git三个字母敲完，资料就出来了。所以，这篇只聊个人观点，项目实战后的感悟。不喜，随意喷！对朋友，我骂人比谁都脏……</p>
+<hr>
+<h1 id="amp-从SVN谈起："><a href="#amp-从SVN谈起：" class="headerlink" title="&amp; 从SVN谈起："></a>&amp; 从SVN谈起：</h1><p>提到版本控制系统，首先要聊两句更纯粹些的SVN，之所以说它纯粹，是因为这种集中式的数据仓库更符合常规思维，它只提供一种途径，这样每个人都使用着相同的方式。<br>而Git却不仅仅是个版本控制系统，大家更愿意把它理解成一个强大的文件系统；虽然不能完全说Git可以取代SVN（实际上它正在做这件事），因为SVN仍然有它的使用场景（例如项目中存在部分无法公开的内容）。<br>但Git 的分布式管理方式更加便捷，分支管理更加轻松，内容更具完整性；这也是我们团队最终从SVN 迁移到Git主要原因。</p>
+<hr>
+<h1 id="amp-Git-Flow"><a href="#amp-Git-Flow" class="headerlink" title="&amp; Git Flow"></a>&amp; Git Flow</h1><blockquote>
+<p>便利的工具在没有规范约束时，往往会成为双刃剑……</p>
+</blockquote>
+<p>​    在开聊Git Flow前，下面这张图可以看到模型的全貌（引自nvie的<a href="http://nvie.com/posts/a-successful-git-branching-model/" target="_blank" rel="noopener">博文</a>)：</p>
+<p><img src="/images/gitflow_p1.png" alt=""></p>
+<p>​    图一放，顿时不想聊太多了……</p>
+<hr>
+<h1 id="amp-讲故事"><a href="#amp-讲故事" class="headerlink" title="&amp; 讲故事"></a>&amp; 讲故事</h1><p>​    Git Flow让我想起了当年的铁道游击队骑着自行车追火车的场景，先把正义感抛开，不管目的是军需还是兵力补充，小范围来看火车都是 <strong>master branch</strong> 了。所以在火车跑起来之前，安全策略就要提前规划好。不要让游击队这种小的 <strong>develop branch</strong> 随意的merge！Github Flow的 <strong>Pull request</strong> 也好，Gitlab flow的 <strong>Merge request</strong>也罢，无非就是为了保证上了火车的人都是经过 <strong>code review</strong> 的。</p>
+<a id="more"></a>
+<p>​    扯回正常的项目开发流程，每个靠谱的项目都不可能只存在一个 <strong>protect branch</strong> ，至少每个开发周期都会存在类似铁道游击队中的自行车（呃，又扯回去了…）这类起初protect，项目上线后可能去删除掉的分支。请记住 <strong>merge</strong> 的方向，一定是先从主到次，再 <strong>merge</strong> 回主，这样可以规避掉手动 <strong>merge</strong> 产生的冲突对主分支的影响；</p>
+<p>​    既然又提到了铁道游击队，就再多聊一些，作为游击队员，无论是否已经登上火车（是否成功merge），遇到巡逻人员（需要切分支处理线上问题等，总之遇到 <strong>commit</strong> 的理由）时，比 <strong>commit</strong> 更明智的决定（前提是此时残缺的功能不适合commit）是 <strong>git stash</strong> 。这种暂存功能太贴心，完全可以等巡逻鬼子走后，一个 <strong>git apply</strong> 继续倒腾没摆放好的炸药！玩high了啊，既然提到炸药，再假想个可怕的情况，游击队员把炸药放错了地方（开发人员这种事常干），这时没必要大动干戈，一个 <strong>git reset</strong> 别让炸弹响就完了，千万不要搞太大又是 <strong>git revert</strong> ， <strong>checkout</strong> 重新搞……</p>
+<hr>
+<h1 id="amp-最后"><a href="#amp-最后" class="headerlink" title="&amp; 最后"></a>&amp; 最后</h1><p>​    项目开发虽然没有上述故事的主题那样牵扯到民族大义、生死存亡，但对于一个有追求的程序员一个专业的团队，任何能够提高开发效率的方法，都值得去尝试！</p>
+<p>​    以上是团队将项目从SVN 迁移到Gitlab后，团队试错踩坑后的些许感悟。今天聊到这，大家去实践吧…</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/git/" rel="tag">#git</a>
+          
+            <a href="/tags/%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86/" rel="tag">#项目管理</a>
+          
+            <a href="/tags/%E6%95%8F%E6%8D%B7/" rel="tag">#敏捷</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/%E5%BC%80%E7%AF%87/" rel="next" title="写在前面">
+                <i class="fa fa-chevron-left"></i> 写在前面
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Leaks/" rel="prev" title="内存泄漏这件大事儿">
+                内存泄漏这件大事儿 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="git-flow/"
+           data-title="用更加优雅的方式做事：Git Flow" data-url="http://thinker-lj.github.io/git-flow/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引子"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-从SVN谈起："><span class="nav-number">2.</span> <span class="nav-text">&amp; 从SVN谈起：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-Git-Flow"><span class="nav-number">3.</span> <span class="nav-text">&amp; Git Flow</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-讲故事"><span class="nav-number">4.</span> <span class="nav-text">&amp; 讲故事</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-最后"><span class="nav-number">5.</span> <span class="nav-text">&amp; 最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

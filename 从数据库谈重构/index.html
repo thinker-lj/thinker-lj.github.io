@@ -1,0 +1,672 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="DataBase,FMDB,多线程," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="在北戴河，看到这番层次分明的美景，我脑海里出现了下面要聊的数据库重构…   事不过三，三则重构！   &amp;amp; 背景与痛点这事儿说来真的话长！很久很久以前，为了保证数据库操作的线程安全，所有操作都放在了主线程，最终，我们这些个小年轻儿忍不了，重构了…重构最终如火如荼搞完了，但还是年轻，虽然使用了FMDB的内置串行队列管理数据库操作，效果也很明显，消息流快的飞起来！但是，偶尔莫名奇妙的crash，">
+<meta name="keywords" content="DataBase,FMDB,多线程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一次Crash引发的持久层重构">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;%E4%BB%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%88%E9%87%8D%E6%9E%84&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="在北戴河，看到这番层次分明的美景，我脑海里出现了下面要聊的数据库重构…   事不过三，三则重构！   &amp;amp; 背景与痛点这事儿说来真的话长！很久很久以前，为了保证数据库操作的线程安全，所有操作都放在了主线程，最终，我们这些个小年轻儿忍不了，重构了…重构最终如火如荼搞完了，但还是年轻，虽然使用了FMDB的内置串行队列管理数据库操作，效果也很明显，消息流快的飞起来！但是，偶尔莫名奇妙的crash，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;%E5%8C%97%E6%88%B4%E6%B2%B3.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14732600573869.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A1%86%E6%9E%B6%E5%9B%BE.png">
+<meta property="og:updated_time" content="2017-02-04T15:23:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;%E5%8C%97%E6%88%B4%E6%B2%B3.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/从数据库谈重构/"/>
+
+
+  <title> 一次Crash引发的持久层重构 | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                一次Crash引发的持久层重构
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-05T23:15:44+08:00" content="2016-09-05">
+              2016-09-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BE%E8%AE%A1%E5%AE%9E%E7%8E%B0/" itemprop="url" rel="index">
+                    <span itemprop="name">设计实现</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/%E4%BB%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%88%E9%87%8D%E6%9E%84/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从数据库谈重构/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/%E5%8C%97%E6%88%B4%E6%B2%B3.jpg" alt="摄于前几日的北戴河之行(与主题有关)"><br>在北戴河，看到这番层次分明的美景，我脑海里出现了下面要聊的数据库重构…</p>
+<hr>
+<blockquote>
+<p>事不过三，三则重构！</p>
+</blockquote>
+<hr>
+<h1 id="amp-背景与痛点"><a href="#amp-背景与痛点" class="headerlink" title="&amp; 背景与痛点"></a>&amp; 背景与痛点</h1><p>这事儿说来真的话长！很久很久以前，为了保证数据库操作的线程安全，所有操作都放在了主线程，最终，我们这些个小年轻儿忍不了，重构了…<br>重构最终如火如荼搞完了，但还是年轻，虽然使用了FMDB的内置<strong>串行队列</strong>管理数据库操作，效果也很明显，消息流快的飞起来！但是，偶尔莫名奇妙的crash，给我们泼了一盆冷水…<br>最终，团队中一个妹子没事儿看代码玩儿，发现了其中的问题，要不说 还是妹子心细啊！其实原因很简单，由于历史遗留问题，外部对数据库的调用，存在多个初始化操作，这样虽然串行队列有了，但是却有多个队列绑定到了多个对象上，所以<strong>crash</strong>是自然的了。<br>上面说了半天，就是下图描述的问题：<br><img src="/images/14732600573869.jpg" alt=""></p>
+<p><strong>因此，我们又走上了重构之路！</strong><a id="more"></a></p>
+<hr>
+<h1 id="amp-理想与现实"><a href="#amp-理想与现实" class="headerlink" title="&amp; 理想与现实"></a>&amp; 理想与现实</h1><p>我们理想中的数据持久层（当然不只是数据库，但这里着重讨论数据库的应用），真不是我们再次重构完成的样子。起初和团队中的旺仔讨论了很久<strong>ORM</strong>，准备撸起袖子大干一场的时候，意识到这样的后果，简直是将之前的Model层、Proxy、数据库接口全部推到重来。最终，我们还是妥协了，对于无法预估的工作量和风险，在工业级产品中是绝对行不通的。我们结合之前的业务，面对现实，搞出了下面这个结构框架：<br><img src="/images/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A1%86%E6%9E%B6%E5%9B%BE.png" alt=""><br>这里着重提下几个关键路径：</p>
+<h2 id="amp-amp-表操作约束协议-Base-Proxy"><a href="#amp-amp-表操作约束协议-Base-Proxy" class="headerlink" title="&amp;&amp; 表操作约束协议 - Base Proxy"></a>&amp;&amp; 表操作约束协议 - Base Proxy</h2><p>这个协议主要约束表的相关操作，在表操作的基类中通过一下限制，如果不实现就报异常：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">instancetype</span>)init &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span> = [<span class="keyword">super</span> init] &amp;&amp; [<span class="keyword">self</span> conformsToProtocol:<span class="class"><span class="keyword">@protocol</span>(<span class="title">XXXDatabaseTableAttachment</span>)]) </span>&#123;</span><br><span class="line">        <span class="comment">// 获取具体表操作对象</span></span><br><span class="line">        _child = XXXDatabaseTableProxy &lt;XXXDatabaseTableAttachment&gt; *)<span class="keyword">self</span>;</span><br><span class="line">        <span class="comment">// 子类无需显式调用表创建</span></span><br><span class="line">        [<span class="keyword">self</span> createTable];</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="comment">// 不遵守协议 抛异常</span></span><br><span class="line">        <span class="built_in">NSException</span> *exception = [<span class="built_in">NSException</span> exceptionWithName:<span class="string">@"XXXDatabaseTableProxy init error"</span> reason:<span class="string">@"the child class must conforms to protocol: &lt;XXXDatabaseTableAttachment&gt;"</span> userInfo:<span class="literal">nil</span>];</span><br><span class="line">        <span class="keyword">@throw</span> exception;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同时表的常规操作公共方法都归类到基类的分类中即图中的Proxy Helper。</p>
+<blockquote>
+<p> 关于Base Proxy的实现，起初考虑的是通过NSProxy利用AOP思想来做消息转发，去支配具体表操作；后来经过细化，发现这样有些过度设计了，不是太好的设计，就放弃了这种方式，进而采用了图中这样，通过很薄的一层Delegate来维系类关系。这部分的具体细节请看我的另一篇着重<a href="http://thinker-lj.com/NSProxy/" target="_blank" rel="noopener">探讨NSProxy的文章</a>。</p>
+</blockquote>
+<h2 id="amp-amp-数据库操作全局调度队列-Global-Queue"><a href="#amp-amp-数据库操作全局调度队列-Global-Queue" class="headerlink" title="&amp;&amp; 数据库操作全局调度队列 - Global Queue"></a>&amp;&amp; 数据库操作全局调度队列 - Global Queue</h2><p>考虑到业务层和数据库操作对接部分会造成线程数爆增，在数据库管理类中加入操作数的全局限制队列，根据不同机型和操作系统设置不同默认操作数。这一点在<strong>AFNetworking</strong>和<strong>SDWebImage</strong>的实现中也有所体现。所有操作的入口和出口，都由这个队列进行管理。</p>
+<hr>
+<h1 id="amp-几点疑问"><a href="#amp-几点疑问" class="headerlink" title="&amp; 几点疑问"></a>&amp; 几点疑问</h1><p>下面的内容是对本次重构框架的延伸讨论，其实每个话题都可以独立成篇了。而且存在即合理，但是这里就不说Core Data 和Realm的诸多优点了，下面只做简要的分析和个人观点阐述（纯属一家直言不可轻信）：</p>
+<h2 id="amp-amp-1-为什么不考虑Core-Data-？"><a href="#amp-amp-1-为什么不考虑Core-Data-？" class="headerlink" title="&amp;&amp; 1.为什么不考虑Core Data ？"></a>&amp;&amp; 1.为什么不考虑Core Data ？</h2><p>首先<strong>Core Data</strong>并不是ORM！作为一种模型层的技术，持久化并不在它的野心范围，所以这部分直接是SQLite的封装，对象图管理才是的真正目的。具体内容可以参考<a href="https://www.objccn.io/issue-4-1/" target="_blank" rel="noopener">这篇文章</a> 下面是我们起初没有采用这个方案的几点考虑：</p>
+<ul>
+<li>Core Data的类结构复杂 ，学习成本太高；</li>
+<li>弃用熟悉的<strong>SQL</strong>和正在使用的<strong>FMDB</strong>，无法接受同时也不现实；</li>
+<li>Core Data 性能无优势，而我们的痛点也不在它擅长的那层抽象上面；</li>
+<li>退一步讲，我们会考虑Realm替代Core Data；</li>
+</ul>
+<h2 id="amp-amp-2-为什么不考虑Realm等ORM方案？"><a href="#amp-amp-2-为什么不考虑Realm等ORM方案？" class="headerlink" title="&amp;&amp; 2.为什么不考虑Realm等ORM方案？"></a>&amp;&amp; 2.为什么不考虑Realm等ORM方案？</h2><p><a href="https://realm.io/cn/" target="_blank" rel="noopener">Realm</a>是值得尊敬的！因为它敢宣称永久免费，它敢弃用SQLite重头来搞，它敢和SQLite比性能，它还提供了Core Data到Realm迁移方案……<br>但是，我们仍然放弃了这个方案！原因有以下几点：</p>
+<ul>
+<li>我们无法接受它提供的基类，如果恰好继承自<strong>RLMObject</strong>基类的Model又在网络接口中扮演角色，而网络层JSON转Model的框架也提供了基类（情况真实存在），那就很尴尬了；</li>
+<li>Realm 提供的内置数据类型侵入性太强，上了贼船，想下很难；</li>
+<li>这一点理由很牵强，但是确实影响着我们：相比几十岁的SQLite，Realm太年轻……</li>
+</ul>
+<h2 id="amp-amp-3-如何制定数据库迁移方案？"><a href="#amp-amp-3-如何制定数据库迁移方案？" class="headerlink" title="&amp;&amp; 3.如何制定数据库迁移方案？"></a>&amp;&amp; 3.如何制定数据库迁移方案？</h2><p>需求变更和业务演进，都会导致数据库结构的变化；想不丢失原有的本地数据，就要考虑数据库的迁移方案。<br>如果你使用的是<strong>FMDB</strong>，那庆幸的的是<strong>FMDBMigrationManager</strong>专门做这件事；Core Data等也有类似的迁移方案，由于项目中还暂时没有遇到此类问题，等真正实践过会独立成篇。</p>
+<hr>
+<h1 id="amp-最后"><a href="#amp-最后" class="headerlink" title="&amp; 最后"></a>&amp; 最后</h1><p>套用Realm的广告，更好的持久层设计，意味着更好的移动端应用。持久层的确关系重大，这也正如标题所言，一次Crash都足以引起我们的重视，同时对它的任何修改，我们也保持保守审慎的态度。因此，最终本次持久层重构并没有如当初预想的大刀阔斧推倒重来，而是在操作队列和协议约束几个关键点上做了调整；这样既没有动太多原有具体表操作的Proxy，减小了影响范围，也达到了解决现有问题的目的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/DataBase/" rel="tag">#DataBase</a>
+          
+            <a href="/tags/FMDB/" rel="tag">#FMDB</a>
+          
+            <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag">#多线程</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/%E3%80%8A%E4%B8%89%E5%B0%91%E7%88%B7%E7%9A%84%E5%89%91%E3%80%8B%E7%BC%BA%E5%B0%91%E4%BA%86%E4%BB%80%E4%B9%88/" rel="next" title="《三少爷的剑》缺少了什么">
+                <i class="fa fa-chevron-left"></i> 《三少爷的剑》缺少了什么
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/%E6%88%91%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%85%8E%E9%87%8D%E4%BD%BF%E7%94%A8%E5%8D%95%E4%BE%8B/" rel="prev" title="为什么要慎重使用单例">
+                为什么要慎重使用单例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="从数据库谈重构/"
+           data-title="一次Crash引发的持久层重构" data-url="http://thinker-lj.github.io/%E4%BB%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%88%E9%87%8D%E6%9E%84/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-背景与痛点"><span class="nav-number">1.</span> <span class="nav-text">&amp; 背景与痛点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-理想与现实"><span class="nav-number">2.</span> <span class="nav-text">&amp; 理想与现实</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-表操作约束协议-Base-Proxy"><span class="nav-number">2.1.</span> <span class="nav-text">&amp;&amp; 表操作约束协议 - Base Proxy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-数据库操作全局调度队列-Global-Queue"><span class="nav-number">2.2.</span> <span class="nav-text">&amp;&amp; 数据库操作全局调度队列 - Global Queue</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-几点疑问"><span class="nav-number">3.</span> <span class="nav-text">&amp; 几点疑问</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-1-为什么不考虑Core-Data-？"><span class="nav-number">3.1.</span> <span class="nav-text">&amp;&amp; 1.为什么不考虑Core Data ？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-2-为什么不考虑Realm等ORM方案？"><span class="nav-number">3.2.</span> <span class="nav-text">&amp;&amp; 2.为什么不考虑Realm等ORM方案？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-3-如何制定数据库迁移方案？"><span class="nav-number">3.3.</span> <span class="nav-text">&amp;&amp; 3.如何制定数据库迁移方案？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-最后"><span class="nav-number">4.</span> <span class="nav-text">&amp; 最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

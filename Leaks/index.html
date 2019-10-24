@@ -1,0 +1,663 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ARC,Instruments,内存优化,Leaks,循环引用," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="你骄傲的和别人说，嘿，我写了个能让Windows崩溃的程序，他们会说“哥们儿，我装Windows系统的时候就免费带着了” —— Linus Benedict Torvalds   &amp;amp; 引子自打“小时候”接触C语言时，对内存处理机制的探究和兴趣，使我最终爱上了写代码这件事，最终走向了这条“不归路”……本文当然不是内存基础知识科普，出于这个目的进来的朋友，我想Google更适合你！今天主要聊">
+<meta name="keywords" content="ARC,Instruments,内存优化,Leaks,循环引用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存泄漏这件大事儿">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;Leaks&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="你骄傲的和别人说，嘿，我写了个能让Windows崩溃的程序，他们会说“哥们儿，我装Windows系统的时候就免费带着了” —— Linus Benedict Torvalds   &amp;amp; 引子自打“小时候”接触C语言时，对内存处理机制的探究和兴趣，使我最终爱上了写代码这件事，最终走向了这条“不归路”……本文当然不是内存基础知识科普，出于这个目的进来的朋友，我想Google更适合你！今天主要聊">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14858506208778.jpg">
+<meta property="og:updated_time" content="2017-02-03T12:29:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14858506208778.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/Leaks/"/>
+
+
+  <title> 内存泄漏这件大事儿 | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                内存泄漏这件大事儿
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-02-26T22:20:19+08:00" content="2016-02-26">
+              2016-02-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index">
+                    <span itemprop="name">技术实践</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/Leaks/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="Leaks/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>你骄傲的和别人说，嘿，我写了个能让Windows崩溃的程序，他们会说“哥们儿，我装Windows系统的时候就免费带着了”</p>
+<p align="right">—— Linus Benedict Torvalds</p>
+</blockquote>
+<hr>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p>自打“小时候”接触C语言时，对内存处理机制的探究和兴趣，使我最终爱上了写代码这件事，最终走向了这条“不归路”……<br>本文当然不是内存基础知识科普，出于这个目的进来的朋友，我想Google更适合你！<br>今天主要聊聊iOS平台日常开发实践中，笔者经常遇到的内存泄露问题及处理策略。</p>
+<hr>
+<h1 id="amp-平台相关"><a href="#amp-平台相关" class="headerlink" title="&amp; 平台相关"></a>&amp; 平台相关</h1><p>众所周知，早在5.0时iOS平台引入了自动引用计数(ARC)技术，这固然解放了不少在内存管理上面耗费的精力，可我始终认为，便捷和效率的提升带来的负面影响就是更多的人只为赶路，开始忽略背后的技术实现。这样的结局就是出了问题后的束手无策！<br>有了ARC，并不代表我们已经轻松到不需要了解内存管理的相关技术，恰恰相反，这是在MRC的基础上，又多了一种需要掌握的技术；同时也不能代表从此我们不会遇到内存相关的问题，实际上这要是本文探讨的核心问题。</p>
+<hr>
+<h1 id="amp-值类型和引用类型"><a href="#amp-值类型和引用类型" class="headerlink" title="&amp; 值类型和引用类型"></a>&amp; 值类型和引用类型</h1><p>内存中需要管理的对象大致也就这两类：值类型和引用类型。值类型，例如int、枚举、结构体等基本数据类型(Swift 中集合类型也被实现为值语义，这带来诸多好处)都紧密排列位于栈中(这点并不绝对，例如较大结构体有置于堆中的可能)，这部分由系统统一管理，不在我们内存泄露的讨论范围。引用类型，也即是跟类扯上关系的一切实例，分配的内存在堆上面，需要我们手动管理，这部分体现在Foundation框架层就交由ARC来管理，当然通过桥接Core Foundation也可以借助ARC管理内存。我们所说的内存泄露，也主要是在引用类型的讨论上。<a id="more"></a></p>
+<hr>
+<h1 id="amp-内存泄露"><a href="#amp-内存泄露" class="headerlink" title="&amp; 内存泄露"></a>&amp; 内存泄露</h1><p>下面从苹果官方文档定义的三种内存泄露情形，分别展开讨论：</p>
+<h2 id="amp-amp-Leaked-memory"><a href="#amp-amp-Leaked-memory" class="headerlink" title="&amp;&amp; Leaked memory"></a>&amp;&amp; Leaked memory</h2><p><strong>应用中不再被引用，但是又不能被使用和释放的内存。</strong>苹果提供的Leaks工具是可以检查出这部分内存泄露的，这部分内存泄露在MRC时代漏写release时很常见，C系函数中忘记free也同样会造成这种内存泄露。例如下面的场景：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">CIContext</span> *context = [<span class="built_in">CIContext</span> contextWithOptions:<span class="literal">nil</span>];</span><br><span class="line"><span class="built_in">CIImage</span> *inputImage = [[<span class="built_in">CIImage</span> alloc] initWithImage:image];</span><br><span class="line">... ...</span><br><span class="line"><span class="built_in">CGImageRef</span> cgImage = [context createCGImage:result fromRect:inputImage.extent];</span><br><span class="line"><span class="built_in">UIImage</span> *resultImage = [<span class="built_in">UIImage</span> imageWithCGImage:cgImage];</span><br><span class="line"><span class="comment">// CGImageRelease(cgImage);</span></span><br></pre></td></tr></table></figure>
+<p>苹果始终在优化和扩展着Instruments系列的工具，Leaks工具在Xcode7之后也支持了真机调试。相信如果将Leaks工具检测列入日常开发的必走流程，这部分内存泄露便可以消灭在萌芽状态。</p>
+<h2 id="amp-amp-Abandoned-memory"><a href="#amp-amp-Abandoned-memory" class="headerlink" title="&amp;&amp; Abandoned memory"></a>&amp;&amp; Abandoned memory</h2><p><strong>应用中不再使用，但仍然被引用的内存。</strong>很遗憾， Abandoned memory是无法通过Leaks工具发现的。这类内存泄露产生的原因，大多数都如下图所示的情形，也就是循环引用。<br><img src="/images/14858506208778.jpg" alt=""><br>这只是造成循环引用的其中一种情况，block、delegate、NStimer等使用不当都会造成循环引用。解决方案就是从环中寻找恰当的点打破循环，针对图中的业务场景，在3处打破循环更为合理。下面对这类内存泄露的检测，提供些思路：</p>
+<ol>
+<li>Allocations<br>这是Instruments工具集中的监测内存分配的工具，既然可以监测内存的使用，那通过针对特定界面的反复交互操作，观察Allocations的变化，是可以发现内存使用问题的。我们也可以通过代码模拟Allocations的类似功能，基本思路是通过hook对象生命周期的调用方法：alloc、dealloc、retain、release等，来监控对象的生命周期。但是，场景的重复操作实在过于繁琐，并没有完全解放双手。</li>
+<li>弱引用策略<br>试想，在对象创建时保存一个weak引用，并借助hook方法，进行全局监控，通过这种方式我们是可以监控整个应用的NSObject对象的，当然也可以缩小范围，只考虑Controller和View。当然，NSArray并不能保存weak引用，不过NSHashTable可以完美满足我们的需求！这种方式的确定时，无法在真正内存泄露时发出警告或者提醒，还是需要人为的预判和干预。</li>
+<li>开源库<br>针对内存泄露的监控，iOS平台已经有较为成熟的工具链，最为知名的当属Facebook开源的内存监控三件套：<a href="https://github.com/facebook/FBRetainCycleDetector" target="_blank" rel="noopener">FBRetainCycleDetector</a>、<a href="https://github.com/facebook/FBAllocationTracker" target="_blank" rel="noopener">FBAllocationTracker</a>、<a href="https://github.com/facebook/FBMemoryProfiler" target="_blank" rel="noopener">FBMemoryProfiler</a>，借助脚本和测试平台，可以实现一套完整的内存泄露检测工具链。</li>
+</ol>
+<h2 id="amp-amp-Cached-memory"><a href="#amp-amp-Cached-memory" class="headerlink" title="&amp;&amp; Cached memory"></a>&amp;&amp; Cached memory</h2><p><strong>应用中为了更好的性能，仍然被引用的内存。</strong> 这类并不能算内存泄露，文档中已经讲得很清楚，其实就是内存缓存嘛！不过，在使用上面的内存泄露监测方法时，内存缓存带来的干扰和数据影响是不能被忽略的。在进行监测时记得对具体这类的所谓内存泄露添加例外，例如单例的使用等等。</p>
+<hr>
+<h1 id="amp-最后"><a href="#amp-最后" class="headerlink" title="&amp; 最后"></a>&amp; 最后</h1><p>对内存泄露的重视程度，可以体现个人和团队的编程素养！更重要的，通过对内存泄露的把控和工具的不断打磨，可以积累更多实战中处理棘手问题的经验，工具习惯养成，专业态度的培养等等。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ARC/" rel="tag">#ARC</a>
+          
+            <a href="/tags/Instruments/" rel="tag">#Instruments</a>
+          
+            <a href="/tags/%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/" rel="tag">#内存优化</a>
+          
+            <a href="/tags/Leaks/" rel="tag">#Leaks</a>
+          
+            <a href="/tags/%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8/" rel="tag">#循环引用</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/git-flow/" rel="next" title="用更加优雅的方式做事：Git Flow">
+                <i class="fa fa-chevron-left"></i> 用更加优雅的方式做事：Git Flow
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Swift%E4%B9%8B%E9%97%AD%E5%8C%85%E4%B8%8E%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8/" rel="prev" title="Swift 之闭包与循环引用">
+                Swift 之闭包与循环引用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="Leaks/"
+           data-title="内存泄漏这件大事儿" data-url="http://thinker-lj.github.io/Leaks/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引子"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-平台相关"><span class="nav-number">2.</span> <span class="nav-text">&amp; 平台相关</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-值类型和引用类型"><span class="nav-number">3.</span> <span class="nav-text">&amp; 值类型和引用类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-内存泄露"><span class="nav-number">4.</span> <span class="nav-text">&amp; 内存泄露</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-Leaked-memory"><span class="nav-number">4.1.</span> <span class="nav-text">&amp;&amp; Leaked memory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-Abandoned-memory"><span class="nav-number">4.2.</span> <span class="nav-text">&amp;&amp; Abandoned memory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-Cached-memory"><span class="nav-number">4.3.</span> <span class="nav-text">&amp;&amp; Cached memory</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-最后"><span class="nav-number">5.</span> <span class="nav-text">&amp; 最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

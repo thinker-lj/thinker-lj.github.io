@@ -1,0 +1,766 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="HTTPs,ATS,HTTP2,SPDY,NSURLProtocol," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="图片来源于Google   明天总会到来，又总会与今天有所不同…   &amp;amp; 引子首先说明，这不是一篇 HTTPs 的科普文，有这个需求的朋友，Google一下是捷径。本文要讨论的重点是，在AppStore关于ATS新规的倒逼下，iOS端（大部分实践Android端同样适用）是如何一步步全面切换到 HTTPs 的。另外，强调个观念，无论Apple针对ATS的审核是否真正严厉，至少 HTTPs">
+<meta name="keywords" content="HTTPs,ATS,HTTP2,SPDY,NSURLProtocol">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ATS 限制下的 HTTPs 改造">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;ATS%E9%99%90%E5%88%B6%E4%B8%8B%E7%9A%84HTTPS%E6%94%B9%E9%80%A0&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="图片来源于Google   明天总会到来，又总会与今天有所不同…   &amp;amp; 引子首先说明，这不是一篇 HTTPs 的科普文，有这个需求的朋友，Google一下是捷径。本文要讨论的重点是，在AppStore关于ATS新规的倒逼下，iOS端（大部分实践Android端同样适用）是如何一步步全面切换到 HTTPs 的。另外，强调个观念，无论Apple针对ATS的审核是否真正严厉，至少 HTTPs">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14815464969586.jpg">
+<meta property="og:updated_time" content="2017-02-03T12:28:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14815464969586.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/ATS限制下的HTTPS改造/"/>
+
+
+  <title> ATS 限制下的 HTTPs 改造 | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                ATS 限制下的 HTTPs 改造
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-12-12T20:25:49+08:00" content="2016-12-12">
+              2016-12-12
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF%E5%AE%9E%E8%B7%B5/" itemprop="url" rel="index">
+                    <span itemprop="name">技术实践</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/ATS%E9%99%90%E5%88%B6%E4%B8%8B%E7%9A%84HTTPS%E6%94%B9%E9%80%A0/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="ATS限制下的HTTPS改造/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/14815464969586.jpg" alt=""><br>图片来源于Google</p>
+<hr>
+<blockquote>
+<p>明天总会到来，又总会与今天有所不同…</p>
+</blockquote>
+<hr>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p>首先说明，这不是一篇 HTTPs 的科普文，有这个需求的朋友，<strong>Google</strong>一下是捷径。本文要讨论的重点是，在AppStore关于<strong>ATS</strong>新规的倒逼下，<strong>iOS</strong>端（大部分实践<strong>Android</strong>端同样适用）是如何一步步全面切换到 HTTPs 的。另外，强调个观念，无论Apple针对ATS的审核是否真正严厉，至少 HTTPs 已经不再是“大势所趋”，可能用“迫在眉睫”更合适了…</p>
+<hr>
+<h1 id="amp-步步为营"><a href="#amp-步步为营" class="headerlink" title="&amp; 步步为营"></a>&amp; 步步为营</h1><p>这个课题的终极目标很清晰：2017年到来之前，全面完成 HTTPs 的改造。拆解成小目标，主要通过以下几个步骤落地：</p>
+<h2 id="amp-amp-一、域名梳理"><a href="#amp-amp-一、域名梳理" class="headerlink" title="&amp;&amp; 一、域名梳理"></a>&amp;&amp; 一、域名梳理</h2><p>项目工程初期的规划是否具有前瞻性以及域名规范标准的执行程度，决定了这个步骤的工作量。可以尝试使用<strong>grep</strong>或者<strong>awk</strong>等文本处理工具跑一遍工程中的<strong>HTTP</strong>字段，这个触目惊心的结果比任何空谈项目规范的教化都会更加印象深刻。最后通过脚本处理，进一步将工程中涉及的上千个请求归类成如下结果：</p>
+<table>
+<thead>
+<tr>
+<th align="center">域名类别</th>
+<th align="center">描述</th>
+<th align="center">特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">线上责任域名</td>
+<td align="center">责任归属本部门的线上环境域名</td>
+<td align="center">整个工程涉及最多的请求 改造重点</td>
+</tr>
+<tr>
+<td align="center">线下责任域名</td>
+<td align="center">责任归属本部门的线下环境域名</td>
+<td align="center">大多已废弃 改造相对轻松</td>
+</tr>
+<tr>
+<td align="center">间接责任域名</td>
+<td align="center">责任归属外部门的域名</td>
+<td align="center">涉及请求分散 沟通成本高</td>
+</tr>
+<tr>
+<td align="center">第三方责任域名</td>
+<td align="center">责任归属三方SDK的域名</td>
+<td align="center">升级或替换组件 终极方案白名单</td>
+</tr>
+<tr>
+<td align="center">这个粗略责任归类，目的是细化子任务让更多的人参与进来，并行推进。域名归类中还有个细节，项目中（尤其pod库中的三方组件）存在大量注释的HTTP请求，推测提交审核的门槛不会是粗暴地做HTTP过滤，更大的可能是对ATS开关的检测。所以，对这类HTTP请求，三方组件中的保持不变，自己项目中的视情况，尽量清除，这样便于后续问题的排查和定位。<a id="more"></a></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">## &amp;&amp; 二、检测工具</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">在业务庞杂的工程项目中，做这种全面改造，难免会有疏漏之处。因此，有效的特定场景检测工具必不可少。<a href="http://thinker-lj.com/NSURLProtocol/" target="_blank" rel="noopener">之前聊过的NSURLProtocol</a>又一次派上了用场…</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在这个编辑request的方法中处理监控更恰当</span></span><br><span class="line">+ (<span class="built_in">NSURLRequest</span> *)canonicalRequestForRequest:(<span class="built_in">NSURLRequest</span> *)request &#123;</span><br><span class="line">    …</span><br><span class="line">    <span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">        <span class="comment">//HTTP/ HTTPs  监控</span></span><br><span class="line">        <span class="comment">// 1.开发阶段可以直接中断言</span></span><br><span class="line">        <span class="comment">// 2.测试阶段可以弹窗提示</span></span><br><span class="line">        <span class="comment">// 3.生产环境建议关闭或者走日志流程</span></span><br><span class="line">    &#125;);</span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面是请求协议头检测的其中一种实践方式，也可以在项目工程所使用的底层网络库例如<a href="http://thinker-lj.com/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BAFNetworking/" target="_blank" rel="noopener">之前聊过的AFN</a>中进行统一处理，不过这样并没有上面提到的NSProtocol处理的全面和优雅；<br>针对接口返回数据，因为数据格式的限制，则直接在底层网络库数据格式化后处理更加合适。<br>这里还需要考虑一点，项目改造初期，不符合预期的请求可能较多，如果采用中断言或者弹窗提示的方式将会不胜其扰。还好之前在项目中集成了一整套Debug工具，只需要将这个域名检测工具扩展进去配置好开关就可以随时在终端控制了。</p>
+<h2 id="amp-amp-三、组件升级"><a href="#amp-amp-三、组件升级" class="headerlink" title="&amp;&amp; 三、组件升级"></a>&amp;&amp; 三、组件升级</h2><p>可以说， HTTPs 改造又是苹果倒逼技术升级的一次成功案例。到此关头，涉及网络请求的相关技术债务到了非还不可的地步了。虽然面对同样的终极目标，但是一千个项目，在本小节讨论的内容上，就会存在一千个别样的组件升级方案。这里只好以我负责改造的项目为例，谈些共性的问题。</p>
+<ul>
+<li>Connection到Session的切换<br>按照iOS通常兼容三到四个最新版本的江湖规矩，iOS10的推出，可以让<strong>NSURLConnection</strong>彻底退出历史舞台了。AFNetworking的3.x版本也全面废弃了相关API，结合我们的项目，并没有急于升级<strong>AFNetworking</strong>到最新版本，而是在封装层做了Connection到Session的改造，既没有影响到业务方调用，也没有在底层库替换上分散过多精力。</li>
+<li>分享组件重构<br>在分享组件的改造上，验证了一个大道理：改变自己能改变的，接受自己不能改变的。<br>第三方分享组件是个很特殊的栗子，也许你绕不开微信的SDK，但是至少可以绕过ShareSDK这层壳子，自己来实现。具体的设计思路在<a href="http://thinker-lj.com/%E5%85%B3%E4%BA%8E%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B9%B3%E5%8F%B0%E5%B0%81%E8%A3%85/" target="_blank" rel="noopener">造个分享的轮子</a>中进行了详细阐述。因此我们也就不再去关心那层壳子是否支持 HTTPs 了…<br>但是，悲观的是，“我们不能改变的”那层出了问题，抓到微信SDK中存在HTTP请求（这里不做过多评价，先解决问题），业界讨论比较多的是前后台切换都会调用的<strong>pingma.com</strong>,针对这类问题，只好先通过添加白名单例外，在审核时给出合理解释来处理。</li>
+<li>地图定位组件替换<br>经不全面调研，主流地图定位SDK已经支持 HTTPs （不负责任的胡说），不过，我们依然采用了终极方案，直接替换为系统库。也建议对系统地图满足需求的情况下，尽量直接使用系统库。这里要注意下替换地图定位组件不要忽略涉及的各种坐标系格式的转换。</li>
+</ul>
+<h2 id="amp-amp-四、生产环境与开发测试环境"><a href="#amp-amp-四、生产环境与开发测试环境" class="headerlink" title="&amp;&amp; 四、生产环境与开发测试环境"></a>&amp;&amp; 四、生产环境与开发测试环境</h2><p>坦白来讲， HTTPs 的升级改造并没有给用户带来体验上的太多提升，同时又给我们开发人员带来了不少麻烦。这也是推进缓慢，苹果最终倒逼强制限制的原因。下面提到的几个问题，可能会存在共性了：</p>
+<ul>
+<li>生产环境与开发测试环境域名不统一<br>这是个很棘手的问题，看到过很多业界针对此类问题的讨论，因为各家工程环境各异，并没有唯一的优雅解决方案。最幸运的一种情况是线下环境与生产环境保持域名统一，日常开发测试通过host配置直接绕过线下自签证书等的繁琐流程。</li>
+<li>ATS开关开启无法正常抓包<br>ATS开关开启，默认无法通过自建证书，这在平时的开发测试环节是个致命问题，最好的处理方式是，开发测试环境默认关闭ATS，打线上发版包时通过脚本开启ATS开关。</li>
+</ul>
+<p>总结一下组件升级这一阶段的基本原则，能采用终极方案的，绝不将就！不要心存侥幸心理，优化是一步步完成的，同样坑也是一点点挖出来的。同时，能多做一点，往前多迈一步，对参与者也是一种难得的历练。</p>
+<hr>
+<h1 id="amp-多多益善"><a href="#amp-多多益善" class="headerlink" title="&amp; 多多益善"></a>&amp; 多多益善</h1><p>据说，人和人的差距，主要在那些可有可无的点的把控能力上。影射到我们这个行业，就是你在异常处理上花费了多少精力。我相信下面谈到的三点，Apple的审核人员并不关心，它更像是车窗旁边挂着的钉锤、角落里落满灰尘的灭火器…</p>
+<h2 id="amp-amp-一、域名映射"><a href="#amp-amp-一、域名映射" class="headerlink" title="&amp;&amp; 一、域名映射"></a>&amp;&amp; 一、域名映射</h2><p>在域名梳理阶段，意识到一个问题：散落在上千个工程文件的域名，如何更好的进行管理？毕竟 HTTPs 的改造不会一劳永逸。一个会频繁出现的场景：某个域名的改造阶段，势必会对HTTP和 HTTPs 不同请求方式结果进行对比，这种频繁的试错和切换方式该如何应对？对于超出证书支持范围的域名（证书支持xx.xx.com,你的却是三级域名），这种频繁切换更加难以验证。为此，我们在改造阶段和后续开发中做了如下几点约束：</p>
+<ol>
+<li>制定统一域名管理类；</li>
+<li>除1中管理类项目中不允许出现直接域名使用；</li>
+<li>制定HTTP和 HTTPs 域名映射表，方便问题定位；</li>
+</ol>
+<h2 id="amp-amp-二、灰度发布"><a href="#amp-amp-二、灰度发布" class="headerlink" title="&amp;&amp; 二、灰度发布"></a>&amp;&amp; 二、灰度发布</h2><p>深入一步，考虑到一个更严重的问题： HTTPs 的全量切换给服务器造成的压力。为了避免服务过载等不可预见问题发生，我们必须有完整的 HTTPs 降级策略。上面的域名管理规范瞬间派上了用场，我们决定将域名映射表交付给服务端来动态配置。同时，初期会考虑灰度发布策略，然后逐步切换到全量，具体做法可以通过用户标识取模运算等或者直接使用<a href="http://thinker-lj.com/%E4%BB%8E%E5%BE%AE%E4%BF%A1%E8%AF%BB%E4%B9%A6%E9%82%80%E6%88%91%E5%86%85%E6%B5%8B%E5%88%B0TestFlight/" target="_blank" rel="noopener">之前聊过的TestFlight</a>方式。</p>
+<h2 id="amp-amp-三、数据监控"><a href="#amp-amp-三、数据监控" class="headerlink" title="&amp;&amp; 三、数据监控"></a>&amp;&amp; 三、数据监控</h2><p>更进一步，我们如何监控这次大规模改造后的用户体验？毕竟在Crash监控平台无法反应出接口的超时和异常情况。于是我们继续完善了之前搭建的接口监控平台（<a href="http://thinker-lj.com/NSURLProtocol/" target="_blank" rel="noopener">NSURLProtocol</a>中有更详细的介绍），其中涵盖了接口响应时间、接口错误码、请求发起的地理位置、IP等信息的统计。</p>
+<h2 id="amp-amp-四、域名收敛"><a href="#amp-amp-四、域名收敛" class="headerlink" title="&amp;&amp; 四、域名收敛"></a>&amp;&amp; 四、域名收敛</h2><p>这一点更多的是出于性能考虑，请求涉及域名越多，必将会带来更多的<strong>TLS握手</strong>，对服务端和客户端性能都会有一定影响。通过域名收敛，将后端接口统一到分发系统中，既可以发挥<strong>HTTP2/SPDY</strong>多路复用（前提是运维支持开启）减少TLS的握手验证时耗，同时也提升了网络资源的并行分发能力。当然，从上面提到的域名梳理环节不难看出，这是个浩大的工程，需要更多端的配合推进，当请相信，这是正确的事！</p>
+<p> HTTPs 改造到这里做的还远远不够，安全策略、稳定性提升、易用扩展还有很多的技术价值等待我们去挖掘。如何在性能优化的道路上，越走越远，沉淀出更多的最佳技术实践，思考后需要重新出发…</p>
+<hr>
+<h1 id="amp-Q-amp-A"><a href="#amp-Q-amp-A" class="headerlink" title="&amp; Q&amp;A"></a>&amp; Q&amp;A</h1><p>下面探讨几个没有唯一标准答案的问题，也包括在版本上线迭代，数据统计分析后，产生的几点思考：</p>
+<h4 id="1-HTTPs-和HTTP相比谁更快？"><a href="#1-HTTPs-和HTTP相比谁更快？" class="headerlink" title="1. HTTPs 和HTTP相比谁更快？"></a>1. HTTPs 和HTTP相比谁更快？</h4><p>先来看一组上面提到的数据监控系统统计的接口的平均响应时间数据：</p>
+<table>
+<thead>
+<tr>
+<th align="center">HTTP</th>
+<th align="center">HTTPs</th>
+<th align="center">Keep-Alive</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">452ms</td>
+<td align="center">487ms</td>
+<td align="center">NO</td>
+</tr>
+<tr>
+<td align="center">436ms</td>
+<td align="center">429 ms</td>
+<td align="center">YES</td>
+</tr>
+<tr>
+<td align="center">这个数据结果出乎意料，在保持连接状态下 HTTPs 的响应速度反超HTTP；试着从以下几点解释这个现象：</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">* 底层网络库升级等前端请求优化带来的性能提升；</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">* 运维开启多路复用和会话复用等减少了握手时间消耗；</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">* 网关会截取分析HTTP通信信息，针对无法解读的 HTTPs 只好放行；</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody></table>
+<p>当然，这个数据统计因为影响因素很多，并不是很客观，并不能作为 HTTPs 比HTTP优越的有利论据，剥离复杂的实际环境，在没有对TCP和HTTP做任何修改又增加了身份验证、信息加密和完整性校验等的情况下，性能损耗是必然的，但大部分的消耗只是在第一次，所以Keep-Alive会带来性能的提升，但与浏览器访问相比，客户端的接口请求相对低频，这种保持连接带来的提升并不明显，同时保持时长的设定也需要兼顾服务负载能力，权衡一个更合理的阈值。不过我们依然相信持续的协议上层性能优化，会产生更多出乎意料的结果！</p>
+<h4 id="2-HTTPs-安全吗？"><a href="#2-HTTPs-安全吗？" class="headerlink" title="2. HTTPs 安全吗？"></a>2. HTTPs 安全吗？</h4><p> HTTPs 只是在HTTP后面通过SSL/TLS增加了Security技术，非对称加密、CA认证、对称加密等这个混合体的任何一个环节出了差错，整个体系就会坍塌。历史上连第三方认证机构都有被攻陷的例子，伪造证书等中间人攻击总在发生，因此不会有绝对的安全。对客户端而言，采取 HTTPs 双向认证策略，本地内置证书等，至少多一层防护，对心存歹心者就多了一层麻烦，有效解决了运营商劫持问题，就是个很好的例子。这是互相博弈的过程，当一件事情足够复杂，就到了考虑实施成本的时候了…</p>
+<h4 id="3-HTTP2-0能带来什么？"><a href="#3-HTTP2-0能带来什么？" class="headerlink" title="3.HTTP2.0能带来什么？"></a>3.HTTP2.0能带来什么？</h4><p>好消息是HTTP2.0对客户端而言是无感知的，多数工作在运维对nginx的简单配置，相比 HTTPs 的升级改造，要简单很多；坏消息是iOS9才开始支持！可以说，大多数对HTTP性能提升的讨论，都没有针对HTTP协议本身优化，但有两个例外：SPDY和HTTP2.0；其实Google推出的SPDY是HTTP2.0的前身，它是位于HTTP和TCP之间的一层协议，在SSL之上，HTTP2.0的关键技术都来自SPDY，略有不同的是SPDY强制使用 HTTPs ，而HTTP2.0可以支持明文传输。降低延迟、设置请求优先级、头部压缩这些还不算惊喜，真正强大的是服务端具有了推送能力。互联网发展到今天，上层建筑的革新推进可谓策马奔腾，而底层协议支撑，很难会有新鲜血液，我们赶上了HTTP推出二十多年后的一次颠覆性技术革新，实属幸运！</p>
+<hr>
+<p>扩展阅读<br><a href="http://mp.weixin.qq.com/s?__biz=MzA3NTYzODYzMg==&mid=402615812&idx=1&sn=b6dae639119bb66e7025321254b8d973&scene=1&srcid=122439MA3l7gRwfjgNOB76pA#rd" target="_blank" rel="noopener">全站  HTTPs  来了</a><br><a href="http://www.alloyteam.com/2016/07/httphttp2-0spdyhttps-reading-this-is-enough/" target="_blank" rel="noopener">HTTP,HTTP2.0,SPDY, HTTPs 你应该知道的一些事</a><br><a href="https://ye11ow.gitbooks.io/http2-explained/content/" target="_blank" rel="noopener">HTTP2 explained</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/HTTPs/" rel="tag">#HTTPs</a>
+          
+            <a href="/tags/ATS/" rel="tag">#ATS</a>
+          
+            <a href="/tags/HTTP2/" rel="tag">#HTTP2</a>
+          
+            <a href="/tags/SPDY/" rel="tag">#SPDY</a>
+          
+            <a href="/tags/NSURLProtocol/" rel="tag">#NSURLProtocol</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/%E4%BB%8E%E5%BE%AE%E4%BF%A1%E8%AF%BB%E4%B9%A6%E9%82%80%E6%88%91%E5%86%85%E6%B5%8B%E5%88%B0TestFlight/" rel="next" title="从微信读书邀我内测到TestFlight">
+                <i class="fa fa-chevron-left"></i> 从微信读书邀我内测到TestFlight
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/%E4%BB%8EBlocksKit%E7%9C%8B%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" rel="prev" title="从BlocksKit看动态代理">
+                从BlocksKit看动态代理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="ATS限制下的HTTPS改造/"
+           data-title="ATS 限制下的 HTTPs 改造" data-url="http://thinker-lj.github.io/ATS%E9%99%90%E5%88%B6%E4%B8%8B%E7%9A%84HTTPS%E6%94%B9%E9%80%A0/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引子"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-步步为营"><span class="nav-number">2.</span> <span class="nav-text">&amp; 步步为营</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-一、域名梳理"><span class="nav-number">2.1.</span> <span class="nav-text">&amp;&amp; 一、域名梳理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-三、组件升级"><span class="nav-number">2.2.</span> <span class="nav-text">&amp;&amp; 三、组件升级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-四、生产环境与开发测试环境"><span class="nav-number">2.3.</span> <span class="nav-text">&amp;&amp; 四、生产环境与开发测试环境</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-多多益善"><span class="nav-number">3.</span> <span class="nav-text">&amp; 多多益善</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-一、域名映射"><span class="nav-number">3.1.</span> <span class="nav-text">&amp;&amp; 一、域名映射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-二、灰度发布"><span class="nav-number">3.2.</span> <span class="nav-text">&amp;&amp; 二、灰度发布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-三、数据监控"><span class="nav-number">3.3.</span> <span class="nav-text">&amp;&amp; 三、数据监控</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-四、域名收敛"><span class="nav-number">3.4.</span> <span class="nav-text">&amp;&amp; 四、域名收敛</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-Q-amp-A"><span class="nav-number">4.</span> <span class="nav-text">&amp; Q&amp;A</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-HTTPs-和HTTP相比谁更快？"><span class="nav-number">4.0.0.1.</span> <span class="nav-text">1. HTTPs 和HTTP相比谁更快？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-HTTPs-安全吗？"><span class="nav-number">4.0.0.2.</span> <span class="nav-text">2. HTTPs 安全吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-HTTP2-0能带来什么？"><span class="nav-number">4.0.0.3.</span> <span class="nav-text">3.HTTP2.0能带来什么？</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

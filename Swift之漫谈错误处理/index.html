@@ -1,0 +1,654 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="一个人知道了自己的短处，能够改过自新，就是幸福的。——莎士比亚   &amp;amp; 引子代码遇到意外，在所难免，Swift 发展到此时的 3.0 版本，对错误处理机制不断完善，面对不同场景，现在我们已经可以有多种选择。风格依旧，本文依然不是如何进行错误处理的严肃科普文，有这个需求的同学，Google 或者官方文档更适合你。下面，我们就聊聊错误处理在 Swift 这门语言中玩出了什么新花样儿…  &amp;a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift之漫谈错误处理">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;Swift%E4%B9%8B%E6%BC%AB%E8%B0%88%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="一个人知道了自己的短处，能够改过自新，就是幸福的。——莎士比亚   &amp;amp; 引子代码遇到意外，在所难免，Swift 发展到此时的 3.0 版本，对错误处理机制不断完善，面对不同场景，现在我们已经可以有多种选择。风格依旧，本文依然不是如何进行错误处理的严肃科普文，有这个需求的同学，Google 或者官方文档更适合你。下面，我们就聊聊错误处理在 Swift 这门语言中玩出了什么新花样儿…  &amp;a">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-02-05T12:13:18.000Z">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/Swift之漫谈错误处理/"/>
+
+
+  <title> Swift之漫谈错误处理 | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Swift之漫谈错误处理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-02-01T19:57:19+08:00" content="2017-02-01">
+              2017-02-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Swift/" itemprop="url" rel="index">
+                    <span itemprop="name">Swift</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/Swift%E4%B9%8B%E6%BC%AB%E8%B0%88%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="Swift之漫谈错误处理/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>一个人知道了自己的短处，能够改过自新，就是幸福的。——莎士比亚</p>
+</blockquote>
+<hr>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p>代码遇到意外，在所难免，Swift 发展到此时的 3.0 版本，对错误处理机制不断完善，面对不同场景，现在我们已经可以有多种选择。风格依旧，本文依然不是如何进行错误处理的严肃科普文，有这个需求的同学，Google 或者官方文档更适合你。下面，我们就聊聊<strong>错误处理</strong>在 Swift 这门语言中玩出了什么新花样儿…</p>
+<hr>
+<h1 id="amp-错误与异常"><a href="#amp-错误与异常" class="headerlink" title="&amp; 错误与异常"></a>&amp; 错误与异常</h1><p>先来看下 Objective-C，错误和异常有着明显的区别，这体现在设计之初的本意上。<strong>错误</strong>的范畴大多会归咎于正常情况，只是结果并不符合我们的预期，例如文件读写失败，产生错误的原因可能是磁盘空间不足等等，网络请求失败，产生错误的原因就更复杂了；但是<strong>异常</strong>大多是我们的代码漏洞造成的，对应的处理类是 NSException。<br>我个人并不喜欢二者这种刻意而且明显区别。特别是针对错误，下面这样的例子应该很常见：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSError</span> *error = <span class="literal">nil</span>;</span><br><span class="line"><span class="built_in">BOOL</span> success = [[<span class="built_in">NSFileManager</span> defaultManager] moveItemAtPath:<span class="string">@"/path/to/target"</span></span><br><span class="line">                                                       toPath:<span class="string">@"/path/to/destination"</span></span><br><span class="line">                                                        error:&amp;error];</span><br><span class="line"><span class="keyword">if</span> (!success) &#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"%@"</span>, error);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 更常见的写法</span></span><br><span class="line">[[<span class="built_in">NSFileManager</span> defaultManager] moveItemAtPath:<span class="string">@"/path/to/target"</span></span><br><span class="line">                                                       toPath:<span class="string">@"/path/to/destination"</span></span><br><span class="line">                                                        error:<span class="literal">nil</span>];</span><br></pre></td></tr></table></figure>
+<p>是的，正如代码中更常见的写法，我们很容易偷懒绕开错误处理，这明显违背了 API 的设计初衷，也影响了代码的鲁棒性并给后续问题排查带来不便。这在 Swift 中得到了有效改善。<a id="more"></a></p>
+<hr>
+<h1 id="amp-throws"><a href="#amp-throws" class="headerlink" title="&amp; throws"></a>&amp; throws</h1><p>这是个让我感到惊讶的特性！从此，我们可以统一错误和异常的处理，在一套代码逻辑中完成非正常情况的处理。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">canThrowErrors</span><span class="params">()</span></span> <span class="keyword">throws</span> -&gt; <span class="type">String</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">cannotThrowErrors</span><span class="params">()</span></span> -&gt; <span class="type">String</span></span><br></pre></td></tr></table></figure>
+<p>像上面那样，一个标有 throws 关键字的函数被称作 throwing 函数。throwing 函数可以在其内部抛出错误，并将错误传递到函数被调用时的作用域。然后在函数被调用处，可以这样处理错误：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">	<span class="keyword">try</span> expression</span><br><span class="line">	statements</span><br><span class="line">&#125; <span class="keyword">catch</span> pattern <span class="number">1</span> &#123;</span><br><span class="line">	statements</span><br><span class="line">&#125; <span class="keyword">catch</span> pattern <span class="number">2</span> <span class="keyword">where</span> condition &#123;</span><br><span class="line">statements &#125;</span><br></pre></td></tr></table></figure>
+<p>如上面所示，在 do-catch 代码块儿中，我们可以捕获函数抛出的错误，但是这里有个明显的事实，这个事实也被业界激烈讨论，褒贬不一。那就是throws抛出的错误是无类型的！我们先试着从合理的角度解释这种设计：无类型错误确实可以让我们的类型签名保持简单，比如要是我们需要指定错误 类型时，多余一种错误会发生的情况下，类型签名很快就会变得更加复杂。但是，这么设计的不足也显而易⻅:没有机制可以指定只有一种错误会发生，这导致了额外的模板代码。此外，throws 只能与函数协同工作，而不能作用于其他类型，这为我们使用它增添了不必要的复杂度。乐观的情况是，蹩脚的情况并不多见，在大多数场景中，throws 仍然是我们可以信赖的选择。</p>
+<hr>
+<h1 id="amp-Result-类型"><a href="#amp-Result-类型" class="headerlink" title="&amp; Result 类型"></a>&amp; Result 类型</h1><p> 上面提到的 throws 是作用于函数的，我们能否自定义一种作用于类型的错误表现形式，在 Swift 中可选值其实就是有两个成员的枚举:一个不包含关联值的 .None 或者 nil，还有一个关联值 Some。Result 跟可选值很相似，也是两个成员组成的枚举，先来看下Result的泛型枚举结构： </p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">Result</span>&lt;<span class="title">A</span>&gt; </span>&#123;</span><br><span class="line">	<span class="keyword">case</span> <span class="type">Failure</span>(<span class="type">ErrorType</span>)</span><br><span class="line">	<span class="keyword">case</span> <span class="type">Success</span>(<span class="type">A</span>) </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>显然，枚举中错误用符合 ErrorType 协议的类型的值来表示。然后，就可以像下面这样处理 Result：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">FileError</span>: <span class="title">ErrorType</span> </span>&#123; </span><br><span class="line">	<span class="keyword">case</span> <span class="type">FileDoesNotExist</span> </span><br><span class="line">	<span class="keyword">case</span> <span class="type">NoPermission</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">contentsOfFile</span><span class="params">( lename: String)</span></span> -&gt; <span class="type">Result</span>&lt;<span class="type">String</span>&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> result = contentsOfFile(<span class="string">"input.txt"</span>) <span class="keyword">switch</span> result &#123;</span><br><span class="line">	<span class="keyword">case</span> <span class="keyword">let</span> .<span class="type">Success</span>(contents): <span class="built_in">print</span> ( contents)</span><br><span class="line">	caselet .<span class="type">Failure</span>(error):</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">let</span>  leError = error <span class="keyword">as</span>? <span class="type">FileError</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">where</span>  leError == .<span class="type">FileDoesNotExist</span> &#123;</span><br><span class="line">	<span class="built_in">print</span>(<span class="string">"Empty  le"</span>) &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	<span class="comment">// 处理错误 </span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> result = contentsOfFile(<span class="string">"input.txt"</span>) <span class="keyword">switch</span> result &#123;</span><br><span class="line">	<span class="keyword">case</span> <span class="keyword">let</span> .<span class="type">Success</span>(contents): <span class="built_in">print</span> ( contents)</span><br><span class="line">	caselet .<span class="type">Failure</span>(error):</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">let</span>  leError = error <span class="keyword">as</span>? <span class="type">FileError</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">where</span>  leError == .<span class="type">FileDoesNotExist</span> &#123;</span><br><span class="line">	<span class="built_in">print</span>(<span class="string">"Empty  le"</span>) &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	<span class="comment">// 处理错误 </span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这给了我们自定义错误类型的可能。Swift 内建的错误处理的实现方式和这很类似，只不过使用了不同的语法。Swift 没有使用返回 Result 的方式来表示失败，而是将方法标记为上面提到的 throws。</p>
+<hr>
+<h1 id="amp-其他可能"><a href="#amp-其他可能" class="headerlink" title="&amp; 其他可能"></a>&amp; 其他可能</h1><p>在Swift的错误处理机制中，我们还有很多选择，下面简单列举几种可能：</p>
+<ul>
+<li>fatalError<br>在遇到确实因为输入的错误无法使程序继续运行的时候，我们一般考虑以产生致命错误 (fatalError) 的方式来终止程序。<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//  @noreturn，表示调用这个方法可以不再需要返回值</span></span><br><span class="line"><span class="meta">@noreturn</span> <span class="function"><span class="keyword">func</span> <span class="title">fatalError</span><span class="params">(@autoclosure message: <span class="params">()</span></span></span> -&gt; <span class="type">String</span> = <span class="keyword">default</span>,</span><br><span class="line">                                          file: <span class="type">StaticString</span> = <span class="keyword">default</span>,</span><br><span class="line">                                          line: <span class="type">UInt</span> = <span class="keyword">default</span>)</span><br></pre></td></tr></table></figure></li>
+<li>断言<br>在 Debug 编译环境下，输入参数的的条件检查，这是常用的手段。  <figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">assert</span><span class="params">(@autoclosure condition: <span class="params">()</span></span></span> -&gt; <span class="type">Bool</span>,</span><br><span class="line">            <span class="meta">@autoclosure</span> <span class="number">_</span> message: () -&gt; <span class="type">String</span> = <span class="keyword">default</span>,</span><br><span class="line">			file: <span class="type">StaticString</span> = <span class="keyword">default</span>,</span><br><span class="line">			line: <span class="type">UInt</span> = <span class="keyword">default</span>)</span><br></pre></td></tr></table></figure></li>
+<li>可选值<br>在处理有可能是 nil 的值时，可选值会非常有用。特别是当我们对错误类型不感兴趣，或者只有一种错误时，我们使用可选值更清晰简洁。</li>
+</ul>
+<hr>
+<h1 id="amp-最后"><a href="#amp-最后" class="headerlink" title="&amp; 最后"></a>&amp; 最后</h1><p>正如上面讨论的，Swift 给我们处理错误提供了多种选择，但是如何在特定场景选择恰当的错误处理机制，需要我们不断揣摩体会。当然，Swift 还很年轻，相信上面提到的问题，在语言的不断发展迭代中会得到优化，我们充满期待！</p>
+<hr>
+<p>扩展阅读<br><a href="http://swifter.tips/fatalerror/" target="_blank" rel="noopener">FATALERROR</a><br><a href="http://swifter.tips/assert/" target="_blank" rel="noopener">断言</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/%E6%AD%A4%E5%88%BB%E8%84%91%E6%B5%B7%E9%87%8C%E7%9A%84%E2%80%9C%E7%BB%A7%E5%BE%80%E5%BC%80%E6%9D%A5%E2%80%9D/" rel="next" title="此刻脑海里的“继往开来”（2016年度总结）">
+                <i class="fa fa-chevron-left"></i> 此刻脑海里的“继往开来”（2016年度总结）
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/%E8%BF%99%E4%B9%88%E8%BF%91%E9%82%A3%E4%B9%88%E8%BF%9C-%E6%AF%95%E4%B8%9A%E4%B8%A4%E5%91%A8%E5%B9%B4%E5%B0%8F%E8%AE%B0/" rel="prev" title="这么近那么远 - 毕业两周年小记">
+                这么近那么远 - 毕业两周年小记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="Swift之漫谈错误处理/"
+           data-title="Swift之漫谈错误处理" data-url="http://thinker-lj.github.io/Swift%E4%B9%8B%E6%BC%AB%E8%B0%88%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引子"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-错误与异常"><span class="nav-number">2.</span> <span class="nav-text">&amp; 错误与异常</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-throws"><span class="nav-number">3.</span> <span class="nav-text">&amp; throws</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-Result-类型"><span class="nav-number">4.</span> <span class="nav-text">&amp; Result 类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-其他可能"><span class="nav-number">5.</span> <span class="nav-text">&amp; 其他可能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-最后"><span class="nav-number">6.</span> <span class="nav-text">&amp; 最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,730 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="SDWebImage," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="Asynchronous image downloader with cache support as a UIImageView category   &amp;amp; 引子“一个支持缓存的异步下载图片的UIImageView分类”,这是SDWebImage官方的相当保守的自我描述；看完下图，就可以了解作者有多么的谦虚；下图我旨在表现SDWebImage的清晰的模块划分和任务分级策略，并不能全面的涵">
+<meta name="keywords" content="SDWebImage">
+<meta property="og:type" content="article">
+<meta property="og:title" content="源码解析之SDWebImage">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BSDWebImage&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="Asynchronous image downloader with cache support as a UIImageView category   &amp;amp; 引子“一个支持缓存的异步下载图片的UIImageView分类”,这是SDWebImage官方的相当保守的自我描述；看完下图，就可以了解作者有多么的谦虚；下图我旨在表现SDWebImage的清晰的模块划分和任务分级策略，并不能全面的涵">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14695977227412.jpg">
+<meta property="og:updated_time" content="2017-02-04T15:19:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14695977227412.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/源码解析之SDWebImage/"/>
+
+
+  <title> 源码解析之SDWebImage | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                源码解析之SDWebImage
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-26T15:02:53+08:00" content="2016-05-26">
+              2016-05-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">源码解析</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BSDWebImage/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="源码解析之SDWebImage/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>Asynchronous image downloader with cache support as a UIImageView category</p>
+</blockquote>
+<hr>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p>“一个支持缓存的异步下载图片的UIImageView分类”,这是SDWebImage官方的相当保守的自我描述；<br>看完下图，就可以了解作者有多么的谦虚；<br>下图我旨在表现SDWebImage的清晰的模块划分和任务分级策略，并不能全面的涵盖它的一切。<br><img src="/images/14695977227412.jpg" alt="SDWebImage 模块划分与任务分级"></p>
+<p>从标题就可以知晓，如果你只是想了解SDWebImage的用法，那最好直接去看<a href="https://github.com/rs/SDWebImage/blob/master/README.md" target="_blank" rel="noopener">README.md</a>;<br>下面我会按照任务分级和模块划分，从以下几个方面抽丝剥茧：</p>
+<hr>
+<h1 id="amp-Cache-缓存管理"><a href="#amp-Cache-缓存管理" class="headerlink" title="&amp; Cache -缓存管理"></a>&amp; Cache -缓存管理</h1><p>内存缓存和磁盘都由<strong>SDImageCache</strong>处理，即有关图片缓存的一切，都封装在这个类里了；</p>
+<h2 id="amp-amp-一-整体流程"><a href="#amp-amp-一-整体流程" class="headerlink" title="&amp;&amp; 一 整体流程"></a>&amp;&amp; 一 整体流程</h2><ul>
+<li>缓存命中流程：<ol>
+<li>通过外部传入的key，首先检查是否命中内存缓存，命中则直接返回；</li>
+<li>检查是否命中磁盘缓存，未命中则返回；</li>
+<li>命中磁盘缓存，检查是否开启内存缓存，开启则设置内存缓存，并返回命中结果；</li>
+</ol>
+</li>
+</ul>
+<h2 id="amp-amp-二-内存缓存"><a href="#amp-amp-二-内存缓存" class="headerlink" title="&amp;&amp; 二 内存缓存"></a>&amp;&amp; 二 内存缓存</h2><p>先来说内存缓存，就像<a href="https://github.com/AFNetworking/AFNetworking" target="_blank" rel="noopener">AFN</a>作者所说，<a href="http://nshipster.cn/nscache/" target="_blank" rel="noopener">NSCache</a>就可以处理一切你想要的了；SDImageCache内部的<strong>memCache</strong>是一个<strong>NSCache</strong>对象，因此直接通过<strong>- setObject:forKey:</strong>就可以设置缓存，但是作者使用了<strong>- setObject:forKey:cost:</strong>，用意是通过<strong>const</strong>来向系统传递单一缓存大小，从而通过系统对整个缓存大小的控制，有效控制整个缓存的容量。但是，这就是NSCache最坑的地方，你永远也无法知道，当缓存到达你设置的临界时，到底是哪部分缓存被清除了（清除也有可能不是立即进行的）。瑕不掩瑜吧，看来作者也并没因此放弃对NSCache的使用。另外，提到const，作者提供了一个计算图片大小的方法，很精简，直接贴出来：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FOUNDATION_STATIC_INLINE <span class="built_in">NSUInteger</span> SDCacheCostForImage(<span class="built_in">UIImage</span> *image) &#123;</span><br><span class="line">    <span class="keyword">return</span> image.size.height * image.size.width * image.scale * image.scale;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 其实这个方法计算出来的并不是图片所占字节数，而是像素点，SDWebImage官方也在<a href="https://github.com/rs/SDWebImage/issues/1369" target="_blank" rel="noopener">此处</a>进行了说明；所以，如果要计算图片所占的大小，可以这样做：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 延续作者的思路</span></span><br><span class="line">image.size.height * image.size.width * image.scale * image.scale * <span class="built_in">CGImageGetBitsPerPixel</span>(image.CGImage) / CHAR_BIT</span><br><span class="line"><span class="comment">// 更简洁的方式</span></span><br><span class="line"><span class="built_in">CGImageGetBytesPerRow</span>(image.CGImage) * <span class="built_in">CGImageGetHeight</span>(image.CGImage)</span><br></pre></td></tr></table></figure>
+<p>以上都是题外话，因为这个计算方法只用在了内存缓存，上面也提到了NSCache的坑，所以此处，这个值也就无所谓了。<br>另外，关于内存缓存删除的触发，除了NSCache的自动处理外（这部分毕竟是不可控的），作者还监听了<strong>UIApplicationDidReceiveMemoryWarningNotification</strong>做了更加保险的处理。</p>
+<h2 id="amp-amp-三-磁盘缓存"><a href="#amp-amp-三-磁盘缓存" class="headerlink" title="&amp;&amp; 三  磁盘缓存"></a>&amp;&amp; 三  磁盘缓存</h2><p>较之内存缓存成熟的NSCache方案，磁盘缓存要相对复杂一些了；<br>因为作者旨在实现的是一个图片缓存管理，相对来说，图片属于大容量对象存储。因此，这里作者直接使用文件存储这种方式，而不是像其他缓存策略那样，数据库和文件并用，也是合理的。</p>
+<ol>
+<li><p>存储<br> 存储部分，剖去外层一系列的判断，最终会调用下面的方法：  </p>
+ <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)storeImageDataToDisk:(<span class="built_in">NSData</span> *)imageData forKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (!imageData) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (![_fileManager fileExistsAtPath:_diskCachePath]) &#123;</span><br><span class="line">        [_fileManager createDirectoryAtPath:_diskCachePath withIntermediateDirectories:<span class="literal">YES</span> attributes:<span class="literal">nil</span> error:<span class="literal">NULL</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// get cache Path for image key</span></span><br><span class="line">    <span class="built_in">NSString</span> *cachePathForKey = [<span class="keyword">self</span> defaultCachePathForKey:key];</span><br><span class="line">    <span class="comment">// transform to NSUrl</span></span><br><span class="line">    <span class="built_in">NSURL</span> *fileURL = [<span class="built_in">NSURL</span> fileURLWithPath:cachePathForKey];</span><br><span class="line">    [_fileManager createFileAtPath:cachePathForKey contents:imageData attributes:<span class="literal">nil</span>];</span><br><span class="line">    <span class="comment">// disable iCloud backup</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.shouldDisableiCloud) &#123;</span><br><span class="line">        [fileURL setResourceValue:[<span class="built_in">NSNumber</span> numberWithBool:<span class="literal">YES</span>] forKey:<span class="built_in">NSURLIsExcludedFromBackupKey</span> error:<span class="literal">nil</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 贴出这个方法，是为了说明，作者并没有在每次的磁盘缓存中去做缓存容量和时间的判断，而是很粗暴的进行了文件存储。<br> 为什么会这么做？所有对磁盘缓存的操作，都放在了<strong>ioQueue</strong>这个串行队列中，试想，如果每次存储都做缓存时效和空间大小的判断和处理，那这个存储效率就太低了，同时缓存的维护代价会变得非常大。当然，外部设置的缓存时效和空间限制也并不是形同虚设，稍后会在缓存清理中做解释。</p>
+</li>
+<li><p>缓存清理<br>先解释上面的问题，缓存清理会在应用进入后台和应用即将被终止时进行。<br>因为作者监听了<strong>UIApplicationDidEnterBackgroundNotification</strong> 和 <strong>UIApplicationWillTerminateNotification</strong>这两个通知。<br>这两个通知，最终都会调用<strong>cleanDiskWithCompletionBlock</strong>方法，这个方法是整个缓存管理类营养价值最高的地方。由于代码量过大，这里就不贴出来了。下面提几个关键点：</p>
+<ul>
+<li>缓存清除策略:时间维度(优先考虑过期时间)和空间维度(LRU逐步衰减)；</li>
+<li>清理工作不会立即进行，考虑I/O阻塞和数组遍历修改易crash等因素，待清除对象最后统一处理。</li>
+<li>采用LRU,而非LFU的原因：文件缓存天然具有修改时间监控优势，这种实现方式维护成本更低。</li>
+</ul>
+</li>
+</ol>
+<a id="more"></a>
+
+<h2 id="amp-amp-四-几个细节"><a href="#amp-amp-四-几个细节" class="headerlink" title="&amp;&amp; 四  几个细节"></a>&amp;&amp; 四  几个细节</h2><ul>
+<li><strong>ImageDataHasPNGPreffix</strong>是一个判断图片使用是PNG;(PNG图片前8个字节是固定的)</li>
+<li>缓存的key，用的URL的MD5值；</li>
+<li><strong>SDDispatchQueueSetterSementics</strong> 是个历史原因，因为起初GCD并不在ARC的管理范围</li>
+</ul>
+<h2 id="amp-amp-五-总结："><a href="#amp-amp-五-总结：" class="headerlink" title="&amp;&amp; 五 总结："></a>&amp;&amp; 五 总结：</h2><p>整个缓存管理类，采用单例模式，在内存缓存中通过NSCache，磁盘缓存中借助本地文件，完成了<strong>时间维度</strong>和<strong>空间维度</strong>双重限制下完整的图片缓存实践；此类中作者给出了在<strong>文件操作</strong>通知处理等教程般的编程示例，值得细细品味。</p>
+<hr>
+<h1 id="amp-Downloader-下载管理"><a href="#amp-Downloader-下载管理" class="headerlink" title="&amp; Downloader - 下载管理"></a>&amp; Downloader - 下载管理</h1><p>下载相关的操作封装在类<strong>SDWebImageDownloader</strong>和<strong>SDWebImageDownloaderOperation</strong>中，前者是后者多任务操作的封装管理者。<br>这部分精彩的是作者对<strong>NSOperationQueue</strong>和<strong>GCD</strong>的玩儿法！</p>
+<h2 id="amp-amp-一-SDWebImageDownloader"><a href="#amp-amp-一-SDWebImageDownloader" class="headerlink" title="&amp;&amp; 一 SDWebImageDownloader"></a>&amp;&amp; 一 SDWebImageDownloader</h2><ul>
+<li><p>先来看下载任务管理类SDWebImageDownloader，主要讨论三个属性两个方法</p>
+<ol>
+<li><p>downloadQueue<br> 这是个NSOperationQueue类型的并发队列，默认的最大任务数是6个；下载相关的直接操作是在这个队列里进行。</p>
+</li>
+<li><p>URLCallbacks<br> 这个字典里存放的是每个下载任务的进度回调和完成回调，具体格式如下：</p>
+ <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"URL0"</span>: <span class="string">"[&#123;"</span>progress<span class="string">":progressBlock, "</span>completed<span class="string">":compeletBlock&#125;, &#123;"</span>progress<span class="string">":progressBlock, "</span>completed<span class="string">":compeletBlock&#125;]"</span>, </span><br><span class="line">    <span class="attr">"URL1"</span>: <span class="string">"[&#123;"</span>progress<span class="string">":progressBlock, "</span>completed<span class="string">":compeletBlock&#125;, &#123;"</span>progress<span class="string">":progressBlock, "</span>completed<span class="string">":compeletBlock&#125;]"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 考虑到会有多个下载任务同时对<strong>URLCallbacks</strong>进行操作，通过<strong>dispatch_barrier_sync</strong>设置屏障来保证线程的安全性。</p>
+</li>
+<li><p>barrierQueue<br> <strong>dispatch_queue_t</strong>类型的并发调度队列；图片下载的回调都在这个队列处理。</p>
+</li>
+<li><p>addProgressCallback: completedBlock:forURL: createCallback:<br> 这个方法主要处理<strong>URLCallbacks</strong>，如果URL对应的数组第一个item进入时，会执行<strong>creatCallback</strong>回调。代码如下：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)addProgressCallback:(SDWebImageDownloaderProgressBlock)progressBlock completedBlock:(SDWebImageDownloaderCompletedBlock)completedBlock forURL:(<span class="built_in">NSURL</span> *)url createCallback:(SDWebImageNoParamsBlock)createCallback &#123;</span><br><span class="line">   ...</span><br><span class="line">   <span class="comment">// first 判断</span></span><br><span class="line">    dispatch_barrier_sync(<span class="keyword">self</span>.barrierQueue, ^&#123;</span><br><span class="line">        <span class="built_in">BOOL</span> first = <span class="literal">NO</span>;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">self</span>.URLCallbacks[url]) &#123;</span><br><span class="line">            <span class="keyword">self</span>.URLCallbacks[url] = [<span class="built_in">NSMutableArray</span> new];</span><br><span class="line">            first = <span class="literal">YES</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">//  URLCallbacks 的设置</span></span><br><span class="line">        <span class="built_in">NSMutableArray</span> *callbacksForURL = <span class="keyword">self</span>.URLCallbacks[url];</span><br><span class="line">        <span class="built_in">NSMutableDictionary</span> *callbacks = [<span class="built_in">NSMutableDictionary</span> new];</span><br><span class="line">        <span class="keyword">if</span> (progressBlock) callbacks[kProgressCallbackKey] = [progressBlock <span class="keyword">copy</span>];</span><br><span class="line">        <span class="keyword">if</span> (completedBlock) callbacks[kCompletedCallbackKey] = [completedBlock <span class="keyword">copy</span>];</span><br><span class="line">        [callbacksForURL addObject:callbacks];</span><br><span class="line">        <span class="keyword">self</span>.URLCallbacks[url] = callbacksForURL;</span><br><span class="line">        <span class="comment">// 是否调用回调</span></span><br><span class="line">        <span class="keyword">if</span> (first) &#123;</span><br><span class="line">            createCallback();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>downloadImageWithURL: options: progress: completed:<br>这个方法是外部执行下载任务调用的方法，其实它的主要部分就是上面提到的<strong>createCallback</strong>任务。这里只贴出此方法的主要部分，具体可<a href="https://github.com/rs/SDWebImage/blob/master/SDWebImage/SDWebImageDownloader.m" target="_blank" rel="noopener">戳这里</a>。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">id</span> &lt;SDWebImageOperation&gt;)downloadImageWithURL:(<span class="built_in">NSURL</span> *)url options:(SDWebImageDownloaderOptions)options progress:(SDWebImageDownloaderProgressBlock)progressBlock completed:(SDWebImageDownloaderCompletedBlock)completedBlock &#123;</span><br><span class="line"> ...</span><br><span class="line"><span class="comment">// 下面的整个部分都是createCallback</span></span><br><span class="line">    [<span class="keyword">self</span> addProgressCallback:progressBlock completedBlock:completedBlock forURL:url createCallback:^&#123;</span><br><span class="line"> ...</span><br><span class="line">        <span class="comment">// 1.创建请求对象 options的设置为了避免NSURLCache+SDImageCache的重复缓存，因此默认不进行NSURLCacke的缓存</span></span><br><span class="line">        <span class="built_in">NSMutableURLRequest</span> *request = [[<span class="built_in">NSMutableURLRequest</span> alloc] initWithURL:url cachePolicy:(options &amp; SDWebImageDownloaderUseNSURLCache ? <span class="built_in">NSURLRequestUseProtocolCachePolicy</span> : <span class="built_in">NSURLRequestReloadIgnoringLocalCacheData</span>) timeoutInterval:timeoutInterval];</span><br><span class="line">         ...</span><br><span class="line">        <span class="comment">// 2.创建SDWebImageDownloaderOperation对象 相关配置会在下面对此类的分析中提到</span></span><br><span class="line">        operation = [[wself.operationClass alloc] initWithRequest:request</span><br><span class="line">                                                        inSession:<span class="keyword">self</span>.session</span><br><span class="line">                                                          options:options</span><br><span class="line">                                                         progress:^(<span class="built_in">NSInteger</span> receivedSize, <span class="built_in">NSInteger</span> expectedSize) &#123;</span><br><span class="line">                                                             ...</span><br><span class="line">                                                            <span class="comment">// 3.回调此URL的所有进度回调</span></span><br><span class="line">                                                             <span class="keyword">for</span> (<span class="built_in">NSDictionary</span> *callbacks <span class="keyword">in</span> callbacksForURL) &#123;</span><br><span class="line">                                                                 <span class="built_in">dispatch_async</span>(dispatch_get_main_queue(), ^&#123;</span><br><span class="line">                                                                     SDWebImageDownloaderProgressBlock callback = callbacks[kProgressCallbackKey];</span><br><span class="line">                                                                     <span class="keyword">if</span> (callback) callback(receivedSize, expectedSize);</span><br><span class="line">                                                                 &#125;</span><br><span class="line">                                                        completed:^(<span class="built_in">UIImage</span> *image, <span class="built_in">NSData</span> *data, <span class="built_in">NSError</span> *error, <span class="built_in">BOOL</span> finished) &#123;</span><br><span class="line">                                                            ...</span><br><span class="line">                                                           <span class="comment">// 4. 任务完成后删除callbacksForURL中该URL</span></span><br><span class="line">                                                            dispatch_barrier_sync(sself.barrierQueue, ^&#123;</span><br><span class="line">                                                                callbacksForURL = [sself.URLCallbacks[url] <span class="keyword">copy</span>];</span><br><span class="line">                                                                <span class="keyword">if</span> (finished) &#123;</span><br><span class="line">                                                                    [sself.URLCallbacks removeObjectForKey:url];</span><br><span class="line">                                                                &#125;</span><br><span class="line">                                                            &#125;);</span><br><span class="line">                                                            <span class="comment">// 5.回调此URL对应的所有完成回调</span></span><br><span class="line">                                                            <span class="keyword">for</span> (<span class="built_in">NSDictionary</span> *callbacks <span class="keyword">in</span> callbacksForURL) &#123;</span><br><span class="line">                                                                SDWebImageDownloaderCompletedBlock callback = callbacks[kCompletedCallbackKey];</span><br><span class="line">                                                                <span class="keyword">if</span> (callback) callback(image, data, error, finished);</span><br><span class="line">                                                            &#125;</span><br><span class="line">                                                        &#125;</span><br><span class="line">                                                        cancelled:^&#123;</span><br><span class="line">                                                             ...</span><br><span class="line">                                                            <span class="comment">// 6.取消操作并将URL对应的回调信息删除</span></span><br><span class="line">                                                            dispatch_barrier_async(sself.barrierQueue, ^&#123;</span><br><span class="line">                                                                [sself.URLCallbacks removeObjectForKey:url];</span><br><span class="line">                                                            &#125;);</span><br><span class="line">                                                        &#125;];</span><br><span class="line">          ...</span><br><span class="line">        <span class="comment">// 7. 将此操作加入到下载队列中</span></span><br><span class="line">        [wself.downloadQueue addOperation:operation];</span><br><span class="line">        <span class="keyword">if</span> (wself.executionOrder == SDWebImageDownloaderLIFOExecutionOrder) &#123;</span><br><span class="line">           <span class="comment">// 8. 如果任务执行顺序是LIFO则将此操作作为原队列的最后一个任务依赖，并将此操作作为最后一个任务</span></span><br><span class="line">            [wself.lastAddedOperation addDependency:operation];</span><br><span class="line">            wself.lastAddedOperation = operation;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> operation;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>SDWebImageDownloader的主要逻辑就在这里了，仔细分析不难发现上面的三属性两方法是整个下载管理器的灵魂。这种将回到通过URL标识，暂存然后统一回调的精妙设计，有效的避免了同一个请求的多次下载操作。</p>
+</li>
+</ol>
+</li>
+</ul>
+<h2 id="amp-amp-二-SDWebImageDownloaderOperation"><a href="#amp-amp-二-SDWebImageDownloaderOperation" class="headerlink" title="&amp;&amp; 二 SDWebImageDownloaderOperation"></a>&amp;&amp; 二 SDWebImageDownloaderOperation</h2><p>SDWebImageDownloaderOperation是<strong>NSOperation</strong>的子类，主要处理图片下载的单个任务操作，此任务最终会被添加到<strong>SDWebImageDownloader</strong>的下载队列中。 外部暴露的主要方法是SDWebImageDownloader用到的<strong>initWithRequest:inSession:options:progress:completed:cancelled</strong>，而此方法主要做了属性的初始化工作。下载任务的真正逻辑在重写的<strong>NSOperation</strong> 的<strong>start</strong>方法中。</p>
+<ol>
+<li><p>start<br> start方法主要做了下面几件事：<br> (1) 设置应用进入后台的相关持续执行处理；<br> (2) 创建 <strong>NSURLSession</strong>（旧版本使用的<strong>NSURLConnetion</strong>），如果外部传入（SDWebImageDownloader），使用外部对象；<br> (3) 开启下载任务，并发送任务开启通知；</p>
+</li>
+<li><p>NSURLSessionDataDelegate 和 NSURLSessionTaskDelegate<br> <strong>NSURLSession</strong>不再向NSURLCollection那样会有数据加载完成即finishLoading的回调；而是在NSURLSessionTaskDelegate的<strong>URLSession:task:didCompleteWithError:</strong>代理中error的判断和<strong>completionBlock</strong>的回调；<strong>URLSession:dataTask:didReceiveData:</strong>主要做数据回传后的图片转换的解码缓存相关处理，同时回调<strong>progressBlock</strong>；</p>
+</li>
+<li><p>一些细节<br>  (1) SDWebImageDownloaderOperation是一个可并发操作对象，通过对各个属性的重写，外部可通过<strong>KVO</strong>监听状态变化；<br>  (2) 对返回的<strong>304</strong>请求响应做了读取本地缓存处理；<br>  (3) 下载任务从开始到结果回调的每个任务，都抛出了<strong>通知</strong>；<br>  (4) <strong>thread</strong>属性指向当前任务执行线程，这在任务取消中做判断处理；<br>  (5) <strong>beginBackgroundTaskWithExpirationHandler</strong>申请更长的后台任务处理时间；</p>
+</li>
+</ol>
+<p>使用NSOperation，在自定义队列中做并发任务时，SDWebImageDownloaderOperation 是 NSOperation子类化的最佳实践。</p>
+<h2 id="amp-amp-三-小结"><a href="#amp-amp-三-小结" class="headerlink" title="&amp;&amp; 三 小结"></a>&amp;&amp; 三 小结</h2><p>下载管理器，通过单个图片下载操作<strong>SDWebImageDownloaderOperation</strong>和多个下载任务的管理<strong>SDWebImageDownloader</strong>封装，只暴露了简洁的接口，而把复杂留给自己，内部结合<strong>GCD</strong>和<strong>NSOperation</strong>，对任务做到精确管理。其实聊到这里，SDWebImage的精华已经几乎被我们榨干了，后续的上层封装所做的一切都要依靠Cache和Downloader来做；</p>
+<hr>
+<h1 id="amp-SDWebImageManager"><a href="#amp-SDWebImageManager" class="headerlink" title="&amp; SDWebImageManager"></a>&amp; SDWebImageManager</h1><p>现在开始探讨题图所示的第二级封装，这一层主要有两个单例：<strong>SDWebImageManager</strong> 和 <strong>SDWebImagePrefetcher</strong>。</p>
+<h2 id="amp-amp-一-SDWebImageManager"><a href="#amp-amp-一-SDWebImageManager" class="headerlink" title="&amp;&amp; 一 SDWebImageManager"></a>&amp;&amp; 一 SDWebImageManager</h2><p>SDWebImageManager在上层分类调用缓存和下载器的起到了传递作用，同时在下载和缓存之间起到了连接作用，旨在把最简洁的接口暴露给外部；<br>此类针对下载其实只暴露了一个方法：<strong>downloadImageWithURL:options:progress:completed</strong>，这个方法做了下面几件事：</p>
+<ol>
+<li>过滤曾经请求失败过的URL，满足条件会直接返回，这样避免了多次的重复无效请求；但是，同时也会因此降低重试的成功率，不过这个特性可以通过option配置；</li>
+<li>调用SDImageCache去尝试命中缓存，如果命中先处理completedBlock，然后将下载任务从<strong>runningOperations</strong>任务管理数组中移除；</li>
+<li>如果未命中，则处理options相关配置，然后发起下载任务；</li>
+</ol>
+<p>上面提到了任务管理数组runningOperations，这个数组主要是为了管理发起的下载任务，控制任务的手动<strong>cancel</strong>等操作。<br>一些细节：为了方便cache命中任务和下载任务的管理，尤其是取消操作，搞了个<strong>SDWebImageCombinedOperation</strong>，内部只实现了任务的取消，同时在回调中或者代理中去取消下载的任务；</p>
+<h2 id="amp-amp-二-SDWebImagePrefetcher"><a href="#amp-amp-二-SDWebImagePrefetcher" class="headerlink" title="&amp;&amp; 二 SDWebImagePrefetcher"></a>&amp;&amp; 二 SDWebImagePrefetcher</h2><p>在需要图片预取的场景中，SDWebImagePrefetcher就派上用场了；其实内部就是个SDWebImageManager的封装，因此即便你不知道有作者会如此贴心，也可以直接用SDWebImageManager实现这个简单的功能。不过，有碰到图片预取的场景时，还是建议使用这个方便的单例类，因为它补充了SDWebImageManager没有涉及的多图预下载，同时还对下载优先级和下载并发数进行了管理。</p>
+<h2 id="amp-amp-三-小结-1"><a href="#amp-amp-三-小结-1" class="headerlink" title="&amp;&amp; 三 小结"></a>&amp;&amp; 三 小结</h2><p>这部分是整个框架的枢纽，在这个层级更多需要在框架的设计和模块组织上思考作者的思路，因为细节部分大多都在底层的缓存和下载器中处理好了。其实，作者在这个层级的表现并没有底层的缓存精彩，主要表现在太多状态的设置和各种无用函数的填充使本不该复杂的实现，变得难以维护。SDWebImageCombinedOperation也显得很鸡肋，感觉作者想通过它做更多事情，但是却又都直接暴露在了SDWebImageManager中，这样使得SDWebImageManager过于臃肿！</p>
+<hr>
+<h1 id="amp-Category"><a href="#amp-Category" class="headerlink" title="&amp; Category"></a>&amp; Category</h1><p>来到框架的第三层，现在估计就是使用此框架的小伙伴们最熟悉的部分了，每个分类依然保持了对外简洁的作风。<br>这里想谈的并不多，说一个SDWebImage在tableView的cell重用是如何保证异步图片加载不错乱的经典问题吧；<br>UIImageView最终会调用分类中的sd_setImageWithURL:placeholderImage:options:progress:completed:方法，此方法最关键的代码：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这个方法的第一行；用意是在同一个ImageView开启下一个任务时，先取消上一个任务；</span></span><br><span class="line">[<span class="keyword">self</span> sd_cancelCurrentImageLoad];</span><br><span class="line"><span class="comment">// 下面是取消操作所做的事情，这个方法在UIView的分类中，原因是UIButton的分类也会用到，所以写在基类中更合适；</span></span><br><span class="line">- (<span class="keyword">void</span>)sd_cancelImageLoadOperationWithKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="comment">// 1.获取操作的维护字典</span></span><br><span class="line">    <span class="built_in">NSMutableDictionary</span> *operationDictionary = [<span class="keyword">self</span> operationDictionary];</span><br><span class="line">    <span class="comment">// 2.拿到同一个URL所有的任务</span></span><br><span class="line">    <span class="keyword">id</span> operations = [operationDictionary objectForKey:key];</span><br><span class="line">    <span class="keyword">if</span> (operations) &#123;</span><br><span class="line">    <span class="comment">// 3.遍历移除</span></span><br><span class="line">        <span class="keyword">if</span> ([operations isKindOfClass:[<span class="built_in">NSArray</span> <span class="keyword">class</span>]]) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">id</span> &lt;SDWebImageOperation&gt; operation <span class="keyword">in</span> operations) &#123;</span><br><span class="line">                <span class="keyword">if</span> (operation) &#123;</span><br><span class="line">                    [operation cancel];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 不是数组的情况下，判断是否实现了SDWebImageOperation协议</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> ([operations conformsToProtocol:<span class="class"><span class="keyword">@protocol</span>(<span class="title">SDWebImageOperation</span>)])</span>&#123;</span><br><span class="line">            [(<span class="keyword">id</span>&lt;SDWebImageOperation&gt;) operations cancel];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 4. 将此URL从字段中移除</span></span><br><span class="line">        [operationDictionary removeObjectForKey:key];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="amp-Tools"><a href="#amp-Tools" class="headerlink" title="&amp; Tools"></a>&amp; Tools</h1><p>作者在搭建整个框架的过程中，抽离出来多个工具类，这部分代码，营养价值依然很高，下面提到几个有代表性的；</p>
+<h2 id="amp-amp-一-SDWebImageDecoder"><a href="#amp-amp-一-SDWebImageDecoder" class="headerlink" title="&amp;&amp; 一 SDWebImageDecoder"></a>&amp;&amp; 一 SDWebImageDecoder</h2><p>此类提供了一个解码<strong>UIImage</strong>的方法，这里牵涉到这样一个细节：<strong>NSData</strong>转换得到的UIImage对象，在用UIImageView等渲染到屏幕上时，中间还有个<strong>解码</strong>获取<strong>位图</strong>的过程。如果这里不做这个解码操作，这个操作就会滞后到主线程去做，这显然会产生阻塞。<br><strong>AFN</strong>也有个类似的方法，但是比这里做的好的地方是，超过1M的大图片，就不再走解码流程，因为位图会占用大量的内存，有可能直接造成<strong>OOM</strong>；这也是SDWebImage始终存在的一个问题，加载大图片时内存暴增，不过可喜的是这个解码属性是可配的。<br>另外，下载器在图片下载完成后，直接调用了缓存；这样造成的结果就是会有频繁的解码操作，提供个思路，可以直接把位图缓存到磁盘。</p>
+<h2 id="amp-amp-二-ImageContentType"><a href="#amp-amp-二-ImageContentType" class="headerlink" title="&amp;&amp; 二 ImageContentType"></a>&amp;&amp; 二 ImageContentType</h2><p>这是个判断图片格式的方法，思路很简单，图片格式的第一个字节都是固定的。作者在实现主体功能时，不断将工具方法独立出来的做法值得效仿推崇。关于图片类型的判断方法，<a href="https://github.com/rs/SDWebImage/blob/master/SDWebImage/NSData%2BImageContentType.m" target="_blank" rel="noopener">戳这里</a></p>
+<h2 id="amp-amp-三-MultiFormat"><a href="#amp-amp-三-MultiFormat" class="headerlink" title="&amp;&amp; 三 MultiFormat"></a>&amp;&amp; 三 MultiFormat</h2><p>这个类是对NSData转换成各种格式的图片数据做了封装，内部还继续抽离出了<strong>GIF</strong>和<strong>WebP</strong>的处理。还有一些处理图片方向<strong>UIImageOrientation</strong>等细节的方法。</p>
+<hr>
+<h1 id="amp-最后"><a href="#amp-最后" class="headerlink" title="&amp; 最后"></a>&amp; 最后</h1><p><strong>简洁的接口，清晰的模块划分</strong>；已经不是第一次品读SDWebImage了，随着代码量的增加，看问题的角度也在发生变化，所以每次都能看到些不一样的东西。我相信，给足够的时间，有点基础的人是可以完成一个完整的图片下载框架的。那我们该思考的是：<strong>你的实现，可以如这般精妙吗？</strong></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SDWebImage/" rel="tag">#SDWebImage</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/NSURLProtocol/" rel="next" title="你真的会用NSURLProtocol？">
+                <i class="fa fa-chevron-left"></i> 你真的会用NSURLProtocol？
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Swift%E4%B9%8B%E9%9D%A2%E5%90%91%E5%8D%8F%E8%AE%AE%E7%BC%96%E7%A8%8B/" rel="prev" title="Swift之面向协议编程">
+                Swift之面向协议编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="源码解析之SDWebImage/"
+           data-title="源码解析之SDWebImage" data-url="http://thinker-lj.github.io/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BSDWebImage/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引子"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-Cache-缓存管理"><span class="nav-number">2.</span> <span class="nav-text">&amp; Cache -缓存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-一-整体流程"><span class="nav-number">2.1.</span> <span class="nav-text">&amp;&amp; 一 整体流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-二-内存缓存"><span class="nav-number">2.2.</span> <span class="nav-text">&amp;&amp; 二 内存缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-三-磁盘缓存"><span class="nav-number">2.3.</span> <span class="nav-text">&amp;&amp; 三  磁盘缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-四-几个细节"><span class="nav-number">2.4.</span> <span class="nav-text">&amp;&amp; 四  几个细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-五-总结："><span class="nav-number">2.5.</span> <span class="nav-text">&amp;&amp; 五 总结：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-Downloader-下载管理"><span class="nav-number">3.</span> <span class="nav-text">&amp; Downloader - 下载管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-一-SDWebImageDownloader"><span class="nav-number">3.1.</span> <span class="nav-text">&amp;&amp; 一 SDWebImageDownloader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-二-SDWebImageDownloaderOperation"><span class="nav-number">3.2.</span> <span class="nav-text">&amp;&amp; 二 SDWebImageDownloaderOperation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-三-小结"><span class="nav-number">3.3.</span> <span class="nav-text">&amp;&amp; 三 小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-SDWebImageManager"><span class="nav-number">4.</span> <span class="nav-text">&amp; SDWebImageManager</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-一-SDWebImageManager"><span class="nav-number">4.1.</span> <span class="nav-text">&amp;&amp; 一 SDWebImageManager</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-二-SDWebImagePrefetcher"><span class="nav-number">4.2.</span> <span class="nav-text">&amp;&amp; 二 SDWebImagePrefetcher</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-三-小结-1"><span class="nav-number">4.3.</span> <span class="nav-text">&amp;&amp; 三 小结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-Category"><span class="nav-number">5.</span> <span class="nav-text">&amp; Category</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-Tools"><span class="nav-number">6.</span> <span class="nav-text">&amp; Tools</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-一-SDWebImageDecoder"><span class="nav-number">6.1.</span> <span class="nav-text">&amp;&amp; 一 SDWebImageDecoder</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-二-ImageContentType"><span class="nav-number">6.2.</span> <span class="nav-text">&amp;&amp; 二 ImageContentType</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-三-MultiFormat"><span class="nav-number">6.3.</span> <span class="nav-text">&amp;&amp; 三 MultiFormat</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-最后"><span class="nav-number">7.</span> <span class="nav-text">&amp; 最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

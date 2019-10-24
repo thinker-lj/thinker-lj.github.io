@@ -1,0 +1,689 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="NSURLProtocol,hook," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="NSURLProtocol 或许是URL加载系统中功能最强大但同时也是最晦涩的部分了… —— [Mattt Thompson](http:&#x2F;&#x2F;nshipster.cn&#x2F;authors&#x2F;mattt-thompson&#x2F;)                                                   &amp;amp; 引子网上针对NSURLProtocol的讨论不仅少之又少，而且在">
+<meta name="keywords" content="NSURLProtocol,hook">
+<meta property="og:type" content="article">
+<meta property="og:title" content="你真的会用NSURLProtocol？">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;NSURLProtocol&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="NSURLProtocol 或许是URL加载系统中功能最强大但同时也是最晦涩的部分了… —— [Mattt Thompson](http:&#x2F;&#x2F;nshipster.cn&#x2F;authors&#x2F;mattt-thompson&#x2F;)                                                   &amp;amp; 引子网上针对NSURLProtocol的讨论不仅少之又少，而且在">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;NSURLProtocol_p0.jpeg">
+<meta property="og:updated_time" content="2017-02-04T15:11:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;NSURLProtocol_p0.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/NSURLProtocol/"/>
+
+
+  <title> 你真的会用NSURLProtocol？ | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                你真的会用NSURLProtocol？
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-01T15:22:55+08:00" content="2016-05-01">
+              2016-05-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E5%A5%87%E6%8A%80%E6%B7%AB%E5%B7%A7/" itemprop="url" rel="index">
+                    <span itemprop="name">奇技淫巧</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/NSURLProtocol/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="NSURLProtocol/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/NSURLProtocol_p0.jpeg" alt="题图来自最近玩的一个小游戏"></p>
+<hr>
+<blockquote>
+<p>NSURLProtocol 或许是URL加载系统中功能最强大但同时也是最晦涩的部分了…</p>
+<p align="right">—— [Mattt Thompson](http://nshipster.cn/authors/mattt-thompson/)</p>                                                
+</blockquote>
+<hr>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p>网上针对NSURLProtocol的讨论不仅少之又少，而且在仅有的资料中还有不少纰漏。显然大多停留在文档阅读或者demo阶段，并没有在工业级项目中应用。这也是我写这篇文章的原因，还是一贯原则：实践出真知！所以本文主要探讨笔者在项目中对NSURLProtocol的应用，旨在填坑和思维发散…</p>
+<hr>
+<h2 id="amp-amp-谈几点经验："><a href="#amp-amp-谈几点经验：" class="headerlink" title="&amp;&amp; 谈几点经验："></a>&amp;&amp; 谈几点经验：</h2><ul>
+<li>NSURLProtocol处在iOS开发中的核武器级别，一旦<strong>registerClass</strong>，影响的是整个项目的URL加载系统；</li>
+<li>鉴于上条原因谈到的影响范围，在工业级项目中使用时记得周知QA，做好全面回归覆盖case；</li>
+<li>处理好<strong>request</strong>标记，防止死循环；</li>
+<li>尽可能全部处理<strong>NSURLProtocolClient</strong>，尤其是<strong>重定向</strong>的方法；</li>
+<li>复杂业务场景下，谨慎处理多个NSURLProtocol子类的注册和继承嵌套；</li>
+<li>可处理<strong>NSURLConnection</strong>、<strong>NSURLSession</strong>、<strong>UIWebView</strong> 对<strong>WKWebView</strong>无法截获；</li>
+</ul>
+<blockquote>
+<p>上面谈到NSURLProtocol功能强大，接下来只聊已经实践过的几个case，希望可以抛砖引玉…</p>
+</blockquote>
+<a id="more"></a>
+
+<hr>
+<h1 id="amp-一、监控所有接口的响应时间"><a href="#amp-一、监控所有接口的响应时间" class="headerlink" title="&amp; 一、监控所有接口的响应时间"></a>&amp; 一、监控所有接口的响应时间</h1><p>步骤如下：</p>
+<ol>
+<li><p>在<strong>startLoading</strong>方法中修改<strong>request</strong>，在<strong>HTTPHeader</strong>中增加请求发起的时间；</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)startLoading &#123;</span><br><span class="line">    <span class="built_in">NSMutableURLRequest</span> *mutableReqeust = [[<span class="keyword">self</span> request] mutableCopy];</span><br><span class="line">    [<span class="built_in">NSURLProtocol</span> setProperty:@YES forKey:kURLProtocolHandledKey inRequest:mutableReqeust];</span><br><span class="line">    [mutableReqeust setValue:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@"</span>, @([<span class="built_in">NSDate</span> date].timeIntervalSince1970)] forHTTPHeaderField:<span class="string">@"requestTime"</span>];</span><br><span class="line">    <span class="keyword">self</span>.connection = [[<span class="built_in">NSURLConnection</span> alloc] initWithRequest:mutableReqeust delegate:<span class="keyword">self</span> startImmediately:<span class="literal">YES</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在<strong>connectionDidFinishLoading</strong>中进行时间的计算；</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>) connectionDidFinishLoading:(<span class="built_in">NSURLConnection</span> *)connection &#123;</span><br><span class="line">    [<span class="keyword">self</span>.client URLProtocolDidFinishLoading:<span class="keyword">self</span>];</span><br><span class="line">  <span class="comment">// 取出header中的请求发起时间，计算出响应时间并记录或上报；</span></span><br><span class="line">    [<span class="keyword">self</span> p_reportLogWithConnection:connection error:<span class="literal">nil</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>考虑到hook的是所有的网络请求，加了接口过滤功能：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 过滤无效请求</span></span><br><span class="line">+ (<span class="built_in">BOOL</span>)filterInvalidHost:(<span class="built_in">NSString</span> *)host &#123;</span><br><span class="line">    <span class="keyword">if</span> (!host) &#123;   </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">YES</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    __block <span class="built_in">BOOL</span> invalid = <span class="literal">YES</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="built_in">NSArray</span> *filterHostArr;</span><br><span class="line">  <span class="comment">// 合法的接口Host</span></span><br><span class="line">    filterHostArr = @[<span class="string">@"XXX.com"</span>……];</span><br><span class="line">    [filterHostArr enumerateObjectsUsingBlock:^(<span class="built_in">NSString</span> * _Nonnull obj, <span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">        <span class="keyword">if</span> ([host containsString:obj]) &#123;</span><br><span class="line">            invalid = <span class="literal">NO</span>;</span><br><span class="line">            *stop = <span class="literal">YES</span>;</span><br><span class="line">        &#125; </span><br><span class="line">    &#125;];</span><br><span class="line">    <span class="keyword">return</span> invalid;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>因为整个过程不涉及UI刷新操作，最好另起线程处理；</p>
+</li>
+<li><p>真正项目中实现的功能，远远不止一个响应时间，通过这个思路，可以实现很多类似功能，我们已经通过此途径搭建了一个接口监控平台；虽然此途径计算的响应时间并不客观，但足以在同一环境下的纵向横向比较，归纳接口整体状况。</p>
+</li>
+</ol>
+<hr>
+<h1 id="amp-二、URL重定向"><a href="#amp-二、URL重定向" class="headerlink" title="&amp; 二、URL重定向"></a>&amp; 二、URL重定向</h1><ul>
+<li><p>说明：这个功能还是很常用的，平时开发和QA测试都不可避免的要切换环境。特别是多部门合作，服务部署在不同环境上，这绝对可以提高不少效率，通过下面的方法，我们已经实现在客户端可视化的配置Host；</p>
+</li>
+<li><p>大致思路：在恰当的时机，全局替换request：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+ (<span class="built_in">NSURLRequest</span> *)canonicalRequestForRequest:(<span class="built_in">NSURLRequest</span> *)request &#123;</span><br><span class="line">    <span class="keyword">return</span> [LJDebugURLProtocol p_configureRequest:request];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​恰当时机，是指<strong>canonicalRequestForRequest</strong>这个函数，替换方式可以写成下面这样：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">  + (<span class="built_in">NSMutableURLRequest</span> *)p_configureRequest:(<span class="built_in">NSURLRequest</span> *)reqeust &#123;</span><br><span class="line">    <span class="built_in">NSMutableURLRequest</span> *mutableReqeust = [reqeust mutableCopy];</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">NSArray</span> &lt;<span class="built_in">NSData</span> *&gt; *hostModels = [[<span class="built_in">NSUserDefaults</span> standardUserDefaults] arrayForKey:kLJDebugConfigureHostModels];</span><br><span class="line">    [hostModels enumerateObjectsUsingBlock:^(<span class="built_in">NSData</span> * _Nonnull obj, <span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> * _Nonnull stop) &#123;</span><br><span class="line">        </span><br><span class="line">        LJDebugConfigureHostModel *hostModel = [<span class="built_in">NSKeyedUnarchiver</span> unarchiveObjectWithData:obj];</span><br><span class="line">        <span class="keyword">if</span> (hostModel.selected &amp;&amp; hostModel.domain &amp;&amp; hostModel.address) &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="built_in">NSString</span> *absoluteString = [mutableReqeust URL].absoluteString;</span><br><span class="line">            <span class="keyword">if</span> ([absoluteString rangeOfString:hostModel.domain].location != <span class="built_in">NSNotFound</span>) &#123;</span><br><span class="line">                </span><br><span class="line">                <span class="built_in">NSString</span> *newAbsoluteString = [absoluteString stringByReplacingOccurrencesOfString:hostModel.domain withString:hostModel.address];</span><br><span class="line">                mutableReqeust.URL = [<span class="built_in">NSURL</span> URLWithString:[<span class="built_in">NSString</span> stringWithFormat:<span class="string">@"%@"</span>, newAbsoluteString]]; </span><br><span class="line">                *stop = <span class="literal">YES</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> mutableReqeust;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<hr>
+<h1 id="amp-三、模拟请求"><a href="#amp-三、模拟请求" class="headerlink" title="&amp; 三、模拟请求"></a>&amp; 三、模拟请求</h1><ul>
+<li>说明：用过Charles都知道，接口联调环节修改请求的response是件很爽的事儿；有没有想过，这个可以直接在客户端实现…</li>
+<li>大致思路：在NSURLProtocol的子类中，实现<strong>NSURLConnectionDataDelegate</strong> 的代理方法，直接将respose修改成想要的结果，然后通过<strong>NSURLProtocolClient</strong>抛出去；<br>不要小看这个功能，发散下去，<strong>过滤请求和返回中的敏感信息</strong>以及<strong>故意制造畸形或非法返回数据来测试程序的鲁棒性</strong> 这些在接口联调环节都可以提高反馈效率；</li>
+</ul>
+<hr>
+<h1 id="amp-最后"><a href="#amp-最后" class="headerlink" title="&amp; 最后"></a>&amp; 最后</h1><p>NSProtocol能做的事情，绝对不仅仅上面提到的这些，相信只要掌握其中的奥义，还有更多可能去实践…</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NSURLProtocol/" rel="tag">#NSURLProtocol</a>
+          
+            <a href="/tags/hook/" rel="tag">#hook</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BAFNetworking/" rel="next" title="源码解析之AFNetworking">
+                <i class="fa fa-chevron-left"></i> 源码解析之AFNetworking
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BSDWebImage/" rel="prev" title="源码解析之SDWebImage">
+                源码解析之SDWebImage <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="NSURLProtocol/"
+           data-title="你真的会用NSURLProtocol？" data-url="http://thinker-lj.github.io/NSURLProtocol/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引子"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引子</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-谈几点经验："><span class="nav-number">1.1.</span> <span class="nav-text">&amp;&amp; 谈几点经验：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-一、监控所有接口的响应时间"><span class="nav-number">2.</span> <span class="nav-text">&amp; 一、监控所有接口的响应时间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-二、URL重定向"><span class="nav-number">3.</span> <span class="nav-text">&amp; 二、URL重定向</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-三、模拟请求"><span class="nav-number">4.</span> <span class="nav-text">&amp; 三、模拟请求</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-最后"><span class="nav-number">5.</span> <span class="nav-text">&amp; 最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

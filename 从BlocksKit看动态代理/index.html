@@ -1,0 +1,659 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="BlocksKit,Delegate,Protocol,Runtime," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="你试过倒立或者跑起来看周围的世界吗？   &amp;amp; 引子之前写过一些源码分析的文章，例如AFNetworking这篇大概敲了两万多字，花了差不多工作之余的将近一周时间。外加在团队内做了分享，算下来的时间投入是个不小的数字。当然，这个时间值得投入，可在我看来，并没有利用到最大化。帕雷托法则（二八定律）告诉我们80%的结果取决于20%的原因，我相信很多经典的开源库可以做到字字珠玑，但是真正核心的内">
+<meta name="keywords" content="BlocksKit,Delegate,Protocol,Runtime">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从BlocksKit看动态代理">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;%E4%BB%8EBlocksKit%E7%9C%8B%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="你试过倒立或者跑起来看周围的世界吗？   &amp;amp; 引子之前写过一些源码分析的文章，例如AFNetworking这篇大概敲了两万多字，花了差不多工作之余的将近一周时间。外加在团队内做了分享，算下来的时间投入是个不小的数字。当然，这个时间值得投入，可在我看来，并没有利用到最大化。帕雷托法则（二八定律）告诉我们80%的结果取决于20%的原因，我相信很多经典的开源库可以做到字字珠玑，但是真正核心的内">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14863431193011.jpg">
+<meta property="og:updated_time" content="2017-02-06T01:05:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14863431193011.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/从BlocksKit看动态代理/"/>
+
+
+  <title> 从BlocksKit看动态代理 | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从BlocksKit看动态代理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-01-22T14:24:52+08:00" content="2017-01-22">
+              2017-01-22
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">源码解析</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/%E4%BB%8EBlocksKit%E7%9C%8B%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从BlocksKit看动态代理/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>你试过倒立或者跑起来看周围的世界吗？</p>
+</blockquote>
+<hr>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p>之前写过一些源码分析的文章，例如<a href="http://thinker-lj.com/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BAFNetworking/" target="_blank" rel="noopener">AFNetworking</a>这篇大概敲了两万多字，花了差不多工作之余的将近一周时间。外加在团队内做了分享，算下来的时间投入是个不小的数字。当然，这个时间值得投入，可在我看来，并没有利用到最大化。<a href="https://zh.wikipedia.org/wiki/%E5%B8%95%E9%9B%B7%E6%89%98%E6%B3%95%E5%88%99" target="_blank" rel="noopener">帕雷托法则（二八定律）</a>告诉我们80%的结果取决于20%的原因，我相信很多经典的开源库可以做到字字珠玑，但是真正核心的内容和思想精髓还是那需要花费我们80%的时间去体会的那20%！因此，我做了一个重要的决定：再写源码分析的文章，不再面面俱到，具体细节会在开源的源码注释中体现，这里我只需要表达出来通过阅读源码后的真正印象深刻的，残留在脑海中的，内化后的感受就可以了。下面，就以此篇做个尝试……</p>
+<hr>
+<h1 id="amp-走马观花"><a href="#amp-走马观花" class="headerlink" title="&amp; 走马观花"></a>&amp; 走马观花</h1><p>在iOS的开源社区五千多的 star ，<a href="https://github.com/zwaldowski/BlocksKit" target="_blank" rel="noopener">BlocksKit</a>其实算不上特别著名。之所以注意到它，是在前段时间研究 <strong>Block</strong> 的内部实现时，成了延伸阅读，竟然发现还很有趣。它为很多常用类提供了更加便捷和友好的附带block参数的接口，当然这部分实现很简单，简单举个例子：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSArray</span> *)bk_map:(<span class="keyword">id</span> (^)(<span class="keyword">id</span> obj))block &#123;</span><br><span class="line">	<span class="built_in">NSParameterAssert</span>(block != <span class="literal">nil</span>);</span><br><span class="line">	</span><br><span class="line">	<span class="built_in">NSMutableArray</span> *result = [<span class="built_in">NSMutableArray</span> arrayWithCapacity:<span class="keyword">self</span>.count];</span><br><span class="line">	[<span class="keyword">self</span> enumerateObjectsUsingBlock:^(<span class="keyword">id</span> obj, <span class="built_in">NSUInteger</span> idx, <span class="built_in">BOOL</span> *stop) &#123;</span><br><span class="line">		<span class="keyword">id</span> value = block(obj) ?: [<span class="built_in">NSNull</span> null];</span><br><span class="line">		[result addObject:value];</span><br><span class="line">	&#125;];</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是个为集合类型提供类似 map 高阶函数的接口，内部直接调用了系统 API ，在合适的地方执行block即可；源码中大部分的实现都类似这种处理策略，唯有针对代理的处理方式让人眼前一亮，这便是这个库的核心了！<a id="more"></a></p>
+<hr>
+<h1 id="amp-大胆假设"><a href="#amp-大胆假设" class="headerlink" title="&amp; 大胆假设"></a>&amp; 大胆假设</h1><p>先抛开 BlocksKit 关于动态代理的实现，我们先简单聊聊代理。<strong>代理</strong>算是对象结构型模式中比较重要的一种设计模式了，具体到 Objective-C 中，我们通常会通过 <strong>Protocol</strong> 来定义一组描述某种功能的接口协议，由委托类处理协议流程，然后由被委托类对协议做具体个性化实现。这在我的另外一篇文章 <a href="http://thinker-lj.com/Swift%E4%B9%8B%E9%9D%A2%E5%90%91%E5%8D%8F%E8%AE%AE%E7%BC%96%E7%A8%8B/" target="_blank" rel="noopener">Swift之面向协议编程</a>对 Swift 环境下的相关新的特性做了详细阐述。同时，业界也有很多关于代理类如何造成循环引用的讨论，以及讨论代理、协议、block区别的文章。可见，代理这个话题并不新鲜，但是这些讨论都停留在代理固有特性的细节层面，我们今天做个大胆的假设：我们可否充当动态的代理类，在 block 中去做协议接口的动态实现……</p>
+<hr>
+<h1 id="amp-渐入佳境"><a href="#amp-渐入佳境" class="headerlink" title="&amp; 渐入佳境"></a>&amp; 渐入佳境</h1><p>试想，在我们自己定义的类中，该如何实现这种动态代理效果？其实很简单，下面就看个例子：我们先简单定义一个协议：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@Protocol XXClassDelegate&lt;<span class="built_in">NSObject</span>&gt;</span><br><span class="line">- (<span class="keyword">void</span>)fetchContent:(<span class="built_in">NSString</span>)content target:(<span class="keyword">id</span>)target;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>然后在委托类的合适地方，调用代理方法，其中这里包括动态调用的版本：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">XXClass</span>: <span class="title">NSObject</span> &lt;<span class="title">XXClassDelegate</span>&gt;</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">weak</span>) <span class="keyword">id</span> &lt;XXClassDelegate&gt; delegate;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="keyword">void</span>(^bk_fetchContentWithTargetBlock)(<span class="built_in">NSString</span> *, <span class="keyword">id</span> *);</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">XXClass</span></span></span><br><span class="line">- (<span class="keyword">void</span>)fetchHandle &#123;</span><br><span class="line">	<span class="keyword">if</span>([_delegate respondsToSelector:<span class="keyword">@selector</span>(fetchContent:target:)]) &#123;</span><br><span class="line">		<span class="comment">// 原有代理模式</span></span><br><span class="line">		[_delegate fetchContent:<span class="literal">nil</span> target:<span class="keyword">self</span>]];</span><br><span class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (bk_fetchContentWithTargetBlock) &#123;</span><br><span class="line">		<span class="comment">// block 分支：需要代理类动态实现</span></span><br><span class="line">		[<span class="keyword">self</span> _bk_fetchContentWithTargetBlock(<span class="literal">nil</span>, <span class="keyword">self</span>)];</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>这样，我们只需要在代理类中需要的地方实现bk_fetchContentWithTargetBlock就可以达到之前协议的效果了。其实，这只不过是将原本需要实现协议做的事情，替换成了 block 实现罢了。我们之所以能这样做，是因为操作协议的类是我们自己定义的，如果是系统 API，比如 UITableView，就无法这样做了，因为我们修改不了UITableView的具体实现。</p>
+<hr>
+<h1 id="amp-拨云见日"><a href="#amp-拨云见日" class="headerlink" title="&amp; 拨云见日"></a>&amp; 拨云见日</h1><p>针对我们无法修改的类，我们该如何去动态代理呢？有这么一个玩笑，在软件系统中，没有什么是增加一个中间件解决不了的，如果有，那就增加两个！虽然是玩笑，却给我们提供了思路！<br>我们知道，协议是委托类和被委托类之间的桥梁，既然现在要动态代理，那这个桥梁就无法完整搭建，这时我们可以在二者之间修条辅路，这个辅路的角色，动态的充当被委托类去实现协议，而在其内部去执行真正被委托类定义的 block 。<strong>BlocksKit</strong> 的精髓就在这里，下面我们以 <strong>UIWebView</strong> 为例来简单以图示意：<br><img src="/images/14863431193011.jpg" alt=""></p>
+<p>原本两层的委托与被被委托关系，通过增加针对性的中间层，利用 runtime 替换原有被委托类，在新委托类中实现协议。这就是整体的动态代理实现思路，当然，中间存在很多细节，针对多个系统类需要设计集散分发中心，具体协议的查找、delegate 动态替换、block 与原方法的映射缓存等等都要统一在这里完成。但是大部分的细节都是在整体思路的规划上，一步步细化并可以迎刃而解的问题，这里不再做具体阐述。</p>
+<hr>
+<h1 id="amp-最后"><a href="#amp-最后" class="headerlink" title="&amp; 最后"></a>&amp; 最后</h1><p>严格意义上讲，这并不算是真正的源码分析，更详细的代码行级注释会在后续整理完成后的开源项目中体现。回到动态代理的讨论上，在实际应用场景中，我并不赞同这种方式的大范围使用，毕竟系统框架设计者完全有能力将 delegate 用 block 的形式定义。之所以为之，其实 delegate 相对来说，虽然更重一些，需要接口实现，方法分离也会带来临时数据的处理，代码也很不清晰，但是当需要定义接口不止一个，同时可以被归为一组，又会被多次调用的场景，delegate 就更有优势了！总之，任何技术都有它适用的场景，千万不要犯一味炫技，拿着锤子找钉子的偏激错误。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BlocksKit/" rel="tag">#BlocksKit</a>
+          
+            <a href="/tags/Delegate/" rel="tag">#Delegate</a>
+          
+            <a href="/tags/Protocol/" rel="tag">#Protocol</a>
+          
+            <a href="/tags/Runtime/" rel="tag">#Runtime</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/ATS%E9%99%90%E5%88%B6%E4%B8%8B%E7%9A%84HTTPS%E6%94%B9%E9%80%A0/" rel="next" title="ATS 限制下的 HTTPs 改造">
+                <i class="fa fa-chevron-left"></i> ATS 限制下的 HTTPs 改造
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/%E6%AD%A4%E5%88%BB%E8%84%91%E6%B5%B7%E9%87%8C%E7%9A%84%E2%80%9C%E7%BB%A7%E5%BE%80%E5%BC%80%E6%9D%A5%E2%80%9D/" rel="prev" title="此刻脑海里的“继往开来”（2016年度总结）">
+                此刻脑海里的“继往开来”（2016年度总结） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="从BlocksKit看动态代理/"
+           data-title="从BlocksKit看动态代理" data-url="http://thinker-lj.github.io/%E4%BB%8EBlocksKit%E7%9C%8B%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引子"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-走马观花"><span class="nav-number">2.</span> <span class="nav-text">&amp; 走马观花</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-大胆假设"><span class="nav-number">3.</span> <span class="nav-text">&amp; 大胆假设</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-渐入佳境"><span class="nav-number">4.</span> <span class="nav-text">&amp; 渐入佳境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-拨云见日"><span class="nav-number">5.</span> <span class="nav-text">&amp; 拨云见日</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-最后"><span class="nav-number">6.</span> <span class="nav-text">&amp; 最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

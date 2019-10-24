@@ -1,0 +1,652 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="testFlight,灰度," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="美图是一个朋友贡献的，她说看了会觉得温暖。我好奇试了试，果然，废话！因为有太阳…   做成一件事并不难，难的是如何更加优雅的做事…   &amp;amp; 引爆点最近一段时间喜欢上了微信读书，因为它有个如上图一样温暖的功能：书中自有黄金屋（读书时长换钱买新书）！这在极大满足我成就感的同时，让我在读书这件事上，有了更加可见的短期效益。额，不要误会，不是软文，下面聊正事儿！今天微信读书突然多了个参与内测的入口">
+<meta name="keywords" content="testFlight,灰度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从微信读书邀我内测到TestFlight">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;%E4%BB%8E%E5%BE%AE%E4%BF%A1%E8%AF%BB%E4%B9%A6%E9%82%80%E6%88%91%E5%86%85%E6%B5%8B%E5%88%B0TestFlight&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="美图是一个朋友贡献的，她说看了会觉得温暖。我好奇试了试，果然，废话！因为有太阳…   做成一件事并不难，难的是如何更加优雅的做事…   &amp;amp; 引爆点最近一段时间喜欢上了微信读书，因为它有个如上图一样温暖的功能：书中自有黄金屋（读书时长换钱买新书）！这在极大满足我成就感的同时，让我在读书这件事上，有了更加可见的短期效益。额，不要误会，不是软文，下面聊正事儿！今天微信读书突然多了个参与内测的入口">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;image001.jpg">
+<meta property="og:updated_time" content="2017-02-04T15:23:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;image001.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/从微信读书邀我内测到TestFlight/"/>
+
+
+  <title> 从微信读书邀我内测到TestFlight | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                从微信读书邀我内测到TestFlight
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-20T21:00:31+08:00" content="2016-10-20">
+              2016-10-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E8%A1%8C%E4%B8%9A%E6%B5%AA%E6%BD%AE/" itemprop="url" rel="index">
+                    <span itemprop="name">行业浪潮</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/%E4%BB%8E%E5%BE%AE%E4%BF%A1%E8%AF%BB%E4%B9%A6%E9%82%80%E6%88%91%E5%86%85%E6%B5%8B%E5%88%B0TestFlight/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="从微信读书邀我内测到TestFlight/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="/images/image001.jpg" alt=""><br>美图是一个朋友贡献的，她说看了会觉得温暖。我好奇试了试，果然，废话！因为有太阳…</p>
+<hr>
+<blockquote>
+<p>做成一件事并不难，难的是如何更加优雅的做事…</p>
+</blockquote>
+<hr>
+<h1 id="amp-引爆点"><a href="#amp-引爆点" class="headerlink" title="&amp; 引爆点"></a>&amp; 引爆点</h1><p>最近一段时间喜欢上了微信读书，因为它有个如上图一样温暖的功能：书中自有黄金屋（读书时长换钱买新书）！这在极大满足我成就感的同时，让我在读书这件事上，有了更加可见的短期效益。额，不要误会，不是软文，下面聊正事儿！<br>今天微信读书突然多了个参与内测的入口，点进去玩了一下，走进了<strong>TestFlight</strong>，忽然勾起了我聊聊iOS内测的冲动…</p>
+<hr>
+<h1 id="amp-黑白之间"><a href="#amp-黑白之间" class="headerlink" title="&amp; 黑白之间"></a>&amp; 黑白之间</h1><p>这个title装了个X，其实就是要先聊下灰度发布。严格来讲，灰度和内测并不对等。前者的范围和涉及的深度都是内测分发无法相提并论的。或者说，内测分发也是灰度发布的支流，闻名的A/B test 也属于灰度的范畴。所以，这里提到灰度发布，也是因为我们在讨论的，就是灰度发布的一种优雅表现形式。<a id="more"></a><br>众所周知，在iOS处处铜墙壁垒的生态环境下，想安安静静的发个新版本都要过五关斩六将（近期审核状况有所改善，但根本性问题仍然存在），更何况时不时又推进下<strong>IPV6</strong>搞个<strong>ATS</strong>门槛儿。言下之意，测试环节很重要！可又有多少团队能承担起一个完善的不需要开发协助的测试团队，更普遍的处理方式是直接外包了（据说，国内某地图巨头上百兆的app就直接交给外包团队了）。这同样也不能解决根本性问题，有时甚至衍生出更复杂的其他层面的问题，毕竟有人的地方，就会存在甩锅，就会增加沟通成本。</p>
+<hr>
+<h1 id="amp-铤而走险"><a href="#amp-铤而走险" class="headerlink" title="&amp; 铤而走险"></a>&amp; 铤而走险</h1><p>墨菲定律告诉我们：<strong>如果事情有变坏的可能，不管这种可能性有多小，它总会发生。</strong><br>AppStore提交的应用是不允许内测，公测字眼出现的，这对各大手游团队是个不小的打击。商业利益的驱使下，越狱渠道大行其道！越狱渠道，成了大型网游保证它的iOS版本质量的不错选择，但不时总会有苹果打压越狱市场的消息传出，封号也是常有的事。其实，越狱对大多非手游的免费场景业务型App意义不大。试想，谁会去越狱渠道下载个美团去叫外卖…</p>
+<hr>
+<h1 id="amp-路遥知马力"><a href="#amp-路遥知马力" class="headerlink" title="&amp; 路遥知马力"></a>&amp; 路遥知马力</h1><p>成熟的App，都会维护一个特定的忠粉圈。比如，某日活千万的直播产品，就会先将新版本交给VIP用户和粉丝数量较多的用户尝鲜。采用的方式是企业级分发（<strong>In-House</strong>模式）的策略，在圈子里扫码传播。这种方式也衍生了很多第三方服务，例如<strong>蒲公英</strong>。但仍然存在问题，分发出去的测试包，或多或少都会存在些问题，毕竟是内测版本，出现重大bug，这些版本的回收就是个头疼的问题了。</p>
+<hr>
+<h1 id="amp-正确姿势"><a href="#amp-正确姿势" class="headerlink" title="&amp; 正确姿势"></a>&amp; 正确姿势</h1><p>饶了这么大圈子，终于到主角登场了：TestFlight。它原本是由Burstly推出，前两年被苹果收购，用于将Beta测试流水化。看来，苹果不仅告诉你不能做什么，还会告诉你应该怎样做。现在唯一的小瑕疵就是只支持iOS8及以上版本，这对仍然适配更低版本的App，算是个借口，但这个问题只能回避，等待时间去淡化。相比于企业分发，通过TF来做Beta测试，它有效期60天的限制算是个不小的优势了。同时，内测25，公测2000的限制，也足够满足测试版需求。简单易用、优雅规范，总之TestFlight值得尝试，特别是在苹果还没准备收费前。</p>
+<hr>
+<h1 id="amp-最后"><a href="#amp-最后" class="headerlink" title="&amp; 最后"></a>&amp; 最后</h1><p>其实CI是个很大的主题，大到我的资历根本无法全面把握。今天之所以敢简单聊聊看法，更多的是出于盲目崇拜吧…<br>苹果在CI上面，已经有足够重视，也每每有突破性的举措。希望且必然，我们在这个平台下的做事方式，会越发优雅。<br>更多TestFlight的科普，请参考文末扩展阅读，本文不废话太多可以随便Google到的内容…</p>
+<hr>
+<p>扩展阅读：<br><a href="https://onevcat.com/2012/01/testflight/" target="_blank" rel="noopener">TestFlight——完美的iOS app测试方案</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/testFlight/" rel="tag">#testFlight</a>
+          
+            <a href="/tags/%E7%81%B0%E5%BA%A6/" rel="tag">#灰度</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/%E6%88%91%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E6%85%8E%E9%87%8D%E4%BD%BF%E7%94%A8%E5%8D%95%E4%BE%8B/" rel="next" title="为什么要慎重使用单例">
+                <i class="fa fa-chevron-left"></i> 为什么要慎重使用单例
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/ATS%E9%99%90%E5%88%B6%E4%B8%8B%E7%9A%84HTTPS%E6%94%B9%E9%80%A0/" rel="prev" title="ATS 限制下的 HTTPs 改造">
+                ATS 限制下的 HTTPs 改造 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="从微信读书邀我内测到TestFlight/"
+           data-title="从微信读书邀我内测到TestFlight" data-url="http://thinker-lj.github.io/%E4%BB%8E%E5%BE%AE%E4%BF%A1%E8%AF%BB%E4%B9%A6%E9%82%80%E6%88%91%E5%86%85%E6%B5%8B%E5%88%B0TestFlight/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引爆点"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引爆点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-黑白之间"><span class="nav-number">2.</span> <span class="nav-text">&amp; 黑白之间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-铤而走险"><span class="nav-number">3.</span> <span class="nav-text">&amp; 铤而走险</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-路遥知马力"><span class="nav-number">4.</span> <span class="nav-text">&amp; 路遥知马力</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-正确姿势"><span class="nav-number">5.</span> <span class="nav-text">&amp; 正确姿势</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-最后"><span class="nav-number">6.</span> <span class="nav-text">&amp; 最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

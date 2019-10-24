@@ -1,0 +1,746 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="WWDC,iOS 11," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="活着就是为了改变世界，难道还有其他原因吗？ - 史蒂夫·乔布斯   &amp;amp; 引子想先看原视频的点这里 iOS 11 为整个生态系统的 UI 元素带来了一种更加大胆、动态的新风格。 下面一起了解一下如何在应用中采用新功能，包括具有集成了搜索的大标题栏，文字图标横向排列的 tab 以及 Table View 带来的惊喜。 通过进一步了解新的模式和增强功能，来为用户提供更加完美的体验。  &amp;amp">
+<meta name="keywords" content="WWDC,iOS 11">
+<meta property="og:type" content="article">
+<meta property="og:title" content="为你的 App 适配 iOS 11 - WWDC 2017 Session 204">
+<meta property="og:url" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;%E4%B8%BA-iOS-11-%E6%9B%B4%E6%96%B0%E4%BD%A0%E7%9A%84App-WWDC-2017-Session-204&#x2F;index.html">
+<meta property="og:site_name" content="暖壶盖儿">
+<meta property="og:description" content="活着就是为了改变世界，难道还有其他原因吗？ - 史蒂夫·乔布斯   &amp;amp; 引子想先看原视频的点这里 iOS 11 为整个生态系统的 UI 元素带来了一种更加大胆、动态的新风格。 下面一起了解一下如何在应用中采用新功能，包括具有集成了搜索的大标题栏，文字图标横向排列的 tab 以及 Table View 带来的惊喜。 通过进一步了解新的模式和增强功能，来为用户提供更加完美的体验。  &amp;amp">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14985813121759.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14984043998211.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14984045416076.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14985302463877.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14985306581727.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14985321149300.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14985336593143.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14985356061148.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14985797338187.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;iPhonex.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;15052826446773.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;15052826796822.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;15052891886187.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;15052889828392.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;15052865582166.jpg">
+<meta property="og:updated_time" content="2017-09-13T15:32:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;thinker-lj.github.io&#x2F;images&#x2F;14985813121759.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://thinker-lj.github.io/为-iOS-11-更新你的App-WWDC-2017-Session-204/"/>
+
+
+  <title> 为你的 App 适配 iOS 11 - WWDC 2017 Session 204 | 暖壶盖儿 </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-89139845-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?733c7768164bf371bb204c415d266f30";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">暖壶盖儿</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                为你的 App 适配 iOS 11 - WWDC 2017 Session 204
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-06-27T14:52:48+08:00" content="2017-06-27">
+              2017-06-27
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/%E4%B8%BA-iOS-11-%E6%9B%B4%E6%96%B0%E4%BD%A0%E7%9A%84App-WWDC-2017-Session-204/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="为-iOS-11-更新你的App-WWDC-2017-Session-204/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>活着就是为了改变世界，难道还有其他原因吗？ - 史蒂夫·乔布斯</p>
+</blockquote>
+<p><img src="/images/14985813121759.jpg" alt=""></p>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p><a href="https://developer.apple.com/videos/play/wwdc2017/204/" target="_blank" rel="noopener">想先看原视频的点这里</a> iOS 11 为整个生态系统的 UI 元素带来了一种更加大胆、动态的新风格。 下面一起了解一下如何在应用中采用新功能，包括具有集成了搜索的大标题栏，文字图标横向排列的 tab 以及 Table View 带来的惊喜。 通过进一步了解新的模式和增强功能，来为用户提供更加完美的体验。</p>
+<hr>
+<h1 id="amp-适配-UIKit’s-Bars带来的新功能"><a href="#amp-适配-UIKit’s-Bars带来的新功能" class="headerlink" title="&amp; 适配 UIKit’s Bars带来的新功能"></a>&amp; 适配 UIKit’s Bars带来的新功能</h1><p>为了完美的用户体验这个终极目标，iOS 和 Android 分别从封闭和开放两个极端不断演化。下图的内容是iOS 11增加的一个文件管理相关的新App，虽然目前功能有限，但有理由相信这又是个乐观的开始。</p>
+<p><img src="/images/14984043998211.jpg" alt=""></p>
+<p>files 这个App为我们展现了iOS 11在UI方面的新特性：更大的标题（通过向上滑动，可以让标题回到原来的UI 效果），整合的搜索框，以及横屏的状态下底部tab会呈现下图所示的 icon 和 text 左右并排显示的新效果。<br><img src="/images/14984045416076.jpg" alt=""><br>关于 files 还有更多有趣的新特性，因为不在本文的讨论范围内，就留给大家去探索吧！<a id="more"></a></p>
+<h2 id="amp-amp-UIBarItem"><a href="#amp-amp-UIBarItem" class="headerlink" title="&amp;&amp; UIBarItem"></a>&amp;&amp; UIBarItem</h2><p>之前 UIBarItem 有个默认值为 nil 的属性 landscapeImagePhone，在iOS 11中新增了 largeContentSizeImage 属性，主要用于导入分辨率更高的图片。关于这部分更详细的讨论，可以参考<a href="https://developer.apple.com/videos/play/wwdc2017/215/" target="_blank" rel="noopener">WWDC2017 Session 215</a></p>
+<h2 id="amp-amp-大标题显示的控制"><a href="#amp-amp-大标题显示的控制" class="headerlink" title="&amp;&amp; 大标题显示的控制"></a>&amp;&amp; 大标题显示的控制</h2><p>刚才在 files 中看到的大标题效果，其实实现起来，非常的简单：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">navigationBar.prefersLargeTitles = <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>如果想要针对当前View Controller 进行个性化的设置，可以通过下面的方式：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">navigationItem.largeTitleDisplayMode </span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>, <span class="built_in">UINavigationItemLargeTitleDisplayMode</span>) &#123;</span><br><span class="line">    <span class="comment">/// 自动模式依赖上一个 item 的特性</span></span><br><span class="line">    <span class="built_in">UINavigationItemLargeTitleDisplayModeAutomatic</span>,</span><br><span class="line">    <span class="comment">/// 针对当前 item 总是启用大标题特性</span></span><br><span class="line">    <span class="built_in">UINavigationItemLargeTitleDisplayModeAlways</span>,</span><br><span class="line">    <span class="comment">/// Never </span></span><br><span class="line">    <span class="built_in">UINavigationItemLargeTitleDisplayModeNever</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="amp-amp-Navigation-集成-UISearchController"><a href="#amp-amp-Navigation-集成-UISearchController" class="headerlink" title="&amp;&amp; Navigation 集成 UISearchController"></a>&amp;&amp; Navigation 集成 UISearchController</h2><p>同样是上面提到的 files为我们带来了最佳实践，而且你还会在iOS 11 的多个系统应用中看到UISearchController 在导航中的集成效果。可喜的是，仅仅通过两个新的属性，实现起来就像下面这样简单：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">navigationItem.searchController </span><br><span class="line">navigationItem.hidesSearchBarWhenScrolling</span><br></pre></td></tr></table></figure>
+<h2 id="amp-amp-UINavigationController-滚动交互"><a href="#amp-amp-UINavigationController-滚动交互" class="headerlink" title="&amp;&amp; UINavigationController 滚动交互"></a>&amp;&amp; UINavigationController 滚动交互</h2><p>设置了大标题和集成了搜索框的 UINavigationController，在上下滑动的交互中会呈现橡皮筋似得拉伸收缩效果，这种体验用多少细致的语言描述，都不如真实场景一个简单的上下滑动来的简单自然。总结下来会涉及下面三个特性：</p>
+<ul>
+<li>搜索框效果更新</li>
+<li>大标题效果更新</li>
+<li>拉伸收缩的整体动态变化效果</li>
+</ul>
+<h2 id="amp-amp-UIToolbar-and-UINavigationBar-—-Layout"><a href="#amp-amp-UIToolbar-and-UINavigationBar-—-Layout" class="headerlink" title="&amp;&amp; UIToolbar and UINavigationBar — Layout"></a>&amp;&amp; UIToolbar and UINavigationBar — Layout</h2><p>为了上面提到的特性实现起来更加自然而优雅，在iOS 11中，针对 UIToolbar 和 UINavigaBar 也做了新的自动布局扩展支持（记得当时现场此处想起了掌声）！这里需要格外注意下，对于 UINavigationBar 这些处于醒目位置而且又在整个容器中长久有效的设置，一定要格外关注，正如苹果的工程师所说:<strong>我们假定你知道自己在做什么</strong>……<br>其中最为重要的一点是使用普通视图时避免大小为0的情况，对此可以从以下几方面解释：</p>
+<ol>
+<li>UINavigationBar 和 UIToolbar 负责提供 位置</li>
+<li>开发者则必须提供视图的大小，这里又包括：<ul>
+<li>对宽度和高度的约束；</li>
+<li>实现 intrinsicContentSize；</li>
+<li>通过约束关联你的子视图；</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h1 id="amp-Margins-and-Insets"><a href="#amp-Margins-and-Insets" class="headerlink" title="&amp; Margins and Insets"></a>&amp; Margins and Insets</h1><h2 id="amp-amp-layoutMargins"><a href="#amp-amp-layoutMargins" class="headerlink" title="&amp;&amp; layoutMargins"></a>&amp;&amp; layoutMargins</h2><p>不管你是不是 <strong>AutoLayout</strong> 的拥簇者，在 iOS 8 添加的一系列 <strong>layoutMargins</strong> 相关的属性和方法，想必都不陌生，可喜的是在 iOS 11 中这些将更为强大和优雅。<br>先通过下图带大家一起回忆下 layoutMargins，这是 UIView中的 UIEdgeInsets 结构体类型的属性，通过它你可以设置目标的内边距（top, left, bottom, right）。试想这样一种场景：在 LTR 的排版格式下，设置 right = 30，变换到 RTL 的排版格式后，坑就出现了，因为这时 left = 30，才不会显得效果突兀。在 iOS 11中，通过新引入的 <strong>directionalLayoutMargins</strong> 属性可以完美解决这个问题。<br><img src="/images/14985302463877.jpg" alt=""></p>
+<p>这是一个 NSDirectionalEdgeInsets 结构体类型的属性，从下面的对比可以看出，leading 和 trailing 取代了之前的 left 和 right。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="built_in">UIEdgeInsets</span> &#123;</span><br><span class="line">    <span class="built_in">CGFloat</span> top, left, bottom, right;</span><br><span class="line">&#125; <span class="built_in">UIEdgeInsets</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="built_in">NSDirectionalEdgeInsets</span> &#123;</span><br><span class="line">    <span class="built_in">CGFloat</span> top, leading, bottom, trailing;</span><br><span class="line">&#125; <span class="built_in">NSDirectionalEdgeInsets</span> API_AVAILABLE(ios(<span class="number">11.0</span>),tvos(<span class="number">11.0</span>),watchos(<span class="number">4.0</span>));</span><br></pre></td></tr></table></figure>
+<p>这时对上面提到的场景下，通过设置 trailing = 30，就会针对不同的排版格式自动去同步 left 和 right。（此刻现场又想起了掌声）<br><img src="/images/14985306581727.jpg" alt=""><br>变化不止于此，以往当你添加 View 到 View Controller 时，UI Kit 会根据内置的特定值对 layoutMargins 微调，遗憾的是这些调整对外是封闭的。没错，iOS 11 有了新变化（此处可以提前鼓掌），在 UIViewController 中同样是刚刚提到的 NSDirectionalEdgeInsets 结构体类型的 新属性 systemMinimumLayoutMargins 来描述通过硬件信息计算出来的合理的系统最小内边距，这个值无法修改。但是否遵循这个最小内边距，可以通过属性 viewRespectsSystemMinimumLayoutMargins 来控制。禁用后，你依然可以通过上面提到的 directionalLayoutMargins 来依据你的特定场景或者异于系统的独特审美来改变内边距。比如下图这个样子：<br><img src="/images/14985321149300.jpg" alt=""></p>
+<h2 id="amp-amp-安全区域-Safe-Area"><a href="#amp-amp-安全区域-Safe-Area" class="headerlink" title="&amp;&amp; 安全区域(Safe Area)"></a>&amp;&amp; 安全区域(Safe Area)</h2><p>安全区域这个词是用来描述不会被上层视图遮挡的显示区域。其实这个区域的边界位置并不安全，想必都遇到过导航栏遮住滚动视图的情况。iOS 7 开始，在 UIViewController中引入的 topLayoutGuide 和 bottomLayoutGuide 在iOS 11 中被废弃了！取而代之的就是安全区域的概念，提供了两种方式来获取安全区域的参照值：safeAreaInsets 和 safeAreaLayoutGuide，即 insets 或者 layout guide。<br>下面以系统的照片应用为例，来说明动态改变安全区域，以后做起来是多么的优雅：</p>
+<p><img src="/images/14985336593143.jpg" alt=""><br>在照片应用的交互中，点击某张照片进入的大图预览模式，一般底部会出现相邻照片的预览工具栏，如何才能让多个场景的变化中底部的工具栏不会遮挡住屏幕中央的照片，在 iOS 11 中你可以像下面这样做：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 动态的改变 安全区域</span></span><br><span class="line"><span class="built_in">UIViewController</span>.additionalSafeAreaInsets </span><br><span class="line"><span class="built_in">UIView</span>.safeAreaInsetsDidChange() </span><br><span class="line"><span class="built_in">UIViewController</span>.viewSafeAreaInsetsDidChange()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h1 id="amp-UIScrollView-和-UITableView-的新特性"><a href="#amp-UIScrollView-和-UITableView-的新特性" class="headerlink" title="&amp; UIScrollView 和 UITableView 的新特性"></a>&amp; UIScrollView 和 UITableView 的新特性</h1><h2 id="amp-amp-Scroll-View"><a href="#amp-amp-Scroll-View" class="headerlink" title="&amp;&amp; Scroll View"></a>&amp;&amp; Scroll View</h2><p>以下是 UIScrollView 在 iOS 11 新加入的属性和方法，主要是对上面提到的安全区域和对 layout guide 的更多支持。 值得注意的 adjustedContentInset 属性替代了 contenInset 所描述的区域并且整合了 UIView 的安全区域概念。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>, <span class="built_in">UIScrollViewContentInsetAdjustmentBehavior</span>) &#123;</span><br><span class="line">    <span class="built_in">UIScrollViewContentInsetAdjustmentAutomatic</span>, </span><br><span class="line">    <span class="built_in">UIScrollViewContentInsetAdjustmentScrollableAxes</span>,</span><br><span class="line">    <span class="built_in">UIScrollViewContentInsetAdjustmentNever</span>,</span><br><span class="line">    <span class="built_in">UIScrollViewContentInsetAdjustmentAlways</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过上面的枚举，配置 adjustedContentInset 的行为</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>) <span class="built_in">UIScrollViewContentInsetAdjustmentBehavior</span> contentInsetAdjustmentBehavior;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 如果 contentInsetAdjustmentBehavior 允许，此属性可以整合 safeAreaInsets 来描述安全区域</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>, <span class="keyword">readonly</span>) <span class="built_in">UIEdgeInsets</span> adjustedContentInset；</span><br><span class="line"></span><br><span class="line"><span class="comment">// 改变 adjustedContentInset 的 response 和 delegate</span></span><br><span class="line">- (<span class="keyword">void</span>)adjustedContentInsetDidChange;</span><br><span class="line">- (<span class="keyword">void</span>)scrollViewDidChangeAdjustedContentInset:(<span class="built_in">UIScrollView</span> *)scrollView;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 用于描述未经转换的 content area 区域</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">readonly</span>,<span class="keyword">strong</span>) <span class="built_in">UILayoutGuide</span> *contentLayoutGuide;</span><br><span class="line"><span class="comment">// 用于描述未经转换的 scroll view 的 frame</span></span><br><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">readonly</span>,<span class="keyword">strong</span>) <span class="built_in">UILayoutGuide</span> *frameLayoutGuide;</span><br></pre></td></tr></table></figure>
+
+<p>之前的 contentInset 并没有废弃，下图可以给出更加直观的解释：<br><img src="/images/14985356061148.jpg" alt=""></p>
+<h2 id="amp-amp-Table-Views"><a href="#amp-amp-Table-Views" class="headerlink" title="&amp;&amp; Table Views"></a>&amp;&amp; Table Views</h2><p>除了继承了父类的以上变化之外，对于 UITableView 本身，也进行了很大的调整，主要包括以下几方面：</p>
+<h3 id="amp-amp-amp-默认启用-Self-Sizing"><a href="#amp-amp-amp-默认启用-Self-Sizing" class="headerlink" title="&amp;&amp;&amp; 默认启用 Self-Sizing"></a>&amp;&amp;&amp; 默认启用 Self-Sizing</h3><p>或许这应该是 UITableView 最大的改变：自从 iOS 8 引入 <strong>Self-Sizing</strong> 以后，动态内容的展示又多了一种优雅的实现方式。而在 iOS 11中，Self-Sizing <strong>默认启用</strong>，这就意味着，你需要确保所有的 cells 都设置好了内部约束，以便告诉 Table View 它应该有的大小，或者去实现相应的 delegate。<br>但是，你可能并不想在你的 App 中写过多的系统差异的代码，而只是为了过早的体验 iOS 11 的这种新特性，那么你可以通过下面的方式去禁用 Self-Sizing：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">override func viewDidLoad() &#123;</span><br><span class="line">    tableView.estimatedRowHeight = <span class="number">0</span> </span><br><span class="line">    tableView.estimatedSectionHeaderHeight = <span class="number">0</span> </span><br><span class="line">    tableView.estimatedSectionFooterHeight = <span class="number">0</span>&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="amp-amp-amp-separatorInset-扩展"><a href="#amp-amp-amp-separatorInset-扩展" class="headerlink" title="&amp;&amp;&amp; separatorInset 扩展"></a>&amp;&amp;&amp; separatorInset 扩展</h3><p>iOS 7 引入 separatorInset 属性，用以设置 cell 的分割线边距，在 iOS 11 中对其进行了扩展。可以通过新增的 UITableViewSeparatorInsetReference 枚举类型的 separatorInsetReference 属性来设置separatorInset 属性的参照值。</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="built_in">NS_ENUM</span>(<span class="built_in">NSInteger</span>, <span class="built_in">UITableViewSeparatorInsetReference</span>) &#123;</span><br><span class="line">    <span class="comment">// 设置为 separatorInset 属性的值被解释为单元格边缘的偏移量。</span></span><br><span class="line">    <span class="built_in">UITableViewSeparatorInsetFromCellEdges</span>,</span><br><span class="line">    <span class="comment">// 设置为 separatorInset 属性的值被解释为分割线的偏移量。</span></span><br><span class="line">    <span class="built_in">UITableViewSeparatorInsetFromAutomaticInsets</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="amp-amp-amp-Table-Views-和-安全区域"><a href="#amp-amp-amp-Table-Views-和-安全区域" class="headerlink" title="&amp;&amp;&amp; Table Views 和 安全区域"></a>&amp;&amp;&amp; Table Views 和 安全区域</h3><p>关于Table Views 特有的安全区域相关的特性，主要注意以下的三点：</p>
+<ol>
+<li>separatorInset 被自动地关联到 safe area insets，这样使得 Table Views 免受 View Controller 的影响；</li>
+<li>UITableviewCell 和 UITableViewHeaderFooterView 的 content view 在 安全区域内；因此你应该始终在 content view中使用 add-subviews 操作。</li>
+<li>UITableViewHeaderFooterView 可以在所有的 headers 和 footers中使用，包括 table headers和footers、section headers 和 footers；同样的也应该始终使用 add-subviews 操作。</li>
+</ol>
+<h3 id="amp-amp-amp-滑动操作-Swipe-Actions"><a href="#amp-amp-amp-滑动操作-Swipe-Actions" class="headerlink" title="&amp;&amp;&amp; 滑动操作(Swipe Actions)"></a>&amp;&amp;&amp; 滑动操作(Swipe Actions)</h3><p>这是个让人兴奋的新特性，也许你之前在系统的邮件应用中尝试过丰富的左划和右划操作。没错，iOS 11 中这些手势操作，通通都可以在你的 App 中实现(此处有掌声)。<br><img src="/images/14985797338187.jpg" alt=""><br>为了实现上图展示的丰富效果，你需要从下面三个方面去适配新的 API：</p>
+<ul>
+<li>Images - 可以添加图片了</li>
+<li>设置 Leading 和 Trailing 操作</li>
+<li>完成的处理和取消的处理</li>
+</ul>
+<hr>
+<h1 id="iPhone-X-适配"><a href="#iPhone-X-适配" class="headerlink" title="iPhone X 适配"></a>iPhone X 适配</h1><p>iPhone X 带给我们的最大改变：全屏 Super Retina显示屏。它提供了更多的内容显示空间，同时也营造了更加深入的沉浸感。 下面我们一起了解下如何设计 App 才能在iPhone X 和其他所有 iOS 设备上都看起来很棒。</p>
+<p><img src="/images/iPhonex.png" alt=""></p>
+<h2 id="屏幕大小"><a href="#屏幕大小" class="headerlink" title="屏幕大小"></a>屏幕大小</h2><p>在竖屏下，iPhone X 上的显示的宽度与 iPhone 6，iPhone 7和 iPhone 8的4.7英寸显示屏的宽度保持一致。然而，iPhone X 比4.7”显示屏高了145个点，这导致增加了大约20％的内容垂直空间。</p>
+<p><img src="/images/15052826446773.jpg" alt=""></p>
+<table>
+<thead>
+<tr>
+<th>Portrait</th>
+<th>Landscape</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1125px × 2436px (375pt × 812pt @3x)</td>
+<td>2436px × 1125px (812pt × 375pt @3x)</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h2><p>在 iPhone X 布局中，最关键的是：必须确保布局填满屏幕，同时又不会被设备的圆角，传感器外壳或用于访 问主屏幕的指示灯所遮盖。</p>
+<p><img src="/images/15052826796822.jpg" alt=""></p>
+<p>可喜的是，大多数标准的系统提供的UI元素和控件（如 navigation bars，tables 和 collections）都已经为新外形做了很好的适配。 背景已经延伸到显示器的边缘，并且UI元件被很恰当地插入和定位在安全区域。<br>因此，对于具有自定义布局的 App，支持iPhone X 也应该比较容易，特别是如果使用了 AutoLayout 并遵守安全区域(safe area)和边距布局(margin layout)指南。这些在上文都已经有过较详细的阐述。<br>下面说几点需要特别注意的：</p>
+<ul>
+<li><p><strong>在 iPhone X 上预览 App</strong>: 在拿到新机之前，也可以先使用 Simulator 来预览和检查下布局问题。 但是一些依赖硬件的功能，如图像效果和交互体验，最好还是在真机上预览。</p>
+</li>
+<li><p><strong>始终保持全屏体验</strong>: 确保背景延伸到显示区域的边缘，以及垂直可滚动的布局（如 tables 和 collections）一直延续到底部。</p>
+</li>
+<li><p><strong>防止边缘内容被裁剪</strong>: 一般来说，内容应该是居中对称的，这样它在任何方向看起来都会很棒，不会被边角角或设备外壳夹住，或被主屏幕的指示器遮挡。 为了获得最佳效果，请使用标准的系统界面元素和 AutoLayout 构建界面。 所有 App 都应遵循 UIKit 定义的安全区域和布局边距，因为这些区域可以根据设备和上下文进行适当的填充。 安全区域还可以防止内容覆盖status bar, navigation bar, toolbar, 以及 tab bar.</p>
+</li>
+<li><p><strong>注意 status bar 的高度</strong>: status bar 在iPhone X 上比在其他 iPhone上更高。 如果假定你固定 status bar 的高度用于将内容定位在 status bar 的下方，那么现在必须更新你的的 App，才能根据用户的设备动态定位内容。 特别需要注意，当后台任务（如录音和位置跟踪）处于活动状态时，iPhone X上的状态栏不会改变高度。</p>
+</li>
+<li><p><strong>重新考虑隐藏 status bar</strong>: iPhone X 较之显示高度为4.7英寸 iPhone 的显示屏提供了更多的垂直方向内容，status bar 占据的只是扩展出来的屏幕区域。况且 status bar 更直观的显示用户有用的信息，如果非要隐藏状态栏，那最好用与这些信息同等重要的内容替代。</p>
+</li>
+<li><p><strong>注意长宽比差异</strong>: iPhone X 具有不同于4.7英寸 iPhone 的长宽比。因此，全屏4.7”iPhone 图形在iPhone X 上全屏显示时出现裁剪或 letterboxing 。同样，全屏iPhone X 图形全屏显示在4.7英寸 iPhone 上时也会被裁剪或 pillarboxing ，因此要确保重要的视觉内容适配这两种尺寸。<img src="/images/15052891886187.jpg" alt=""></p>
+</li>
+<li><p><strong>避免交互式控件出现在屏幕底部和角落</strong>: iPhone X 提供了显示屏底部的滑动手势来访问主屏幕和应用程序切换器的新交互方式，这些手势可能会取消在此区域中实现的自定义手势。 况且屏幕的两个角落过多复杂的交互也不是最佳体验的良好实践。<img src="/images/15052889828392.jpg" alt=""></p>
+</li>
+<li><p><strong>不要遮挡或者特别修饰显示特性来引起用户注意</strong>: 请勿尝试隐藏设备的圆角、传感器外壳，或者通过在屏幕顶部和底部放置控件来访问主屏幕的引导。也要特别注意不要试图使用像括号，边框或各种符号等视觉修饰这些特殊区域。</p>
+</li>
+<li><p>为了轻松访问主屏幕允许自动隐藏指示器: 当开启自动隐藏时，如果用户离开屏幕几秒钟，指示器将消失。 当用户再次触摸屏幕时，它会重新出现。 这种行为应该只能用于提升观看体验，如播放视频或照片幻灯片。</p>
+</li>
+</ul>
+<h2 id="色彩"><a href="#色彩" class="headerlink" title="色彩"></a>色彩</h2><p>iPhone X 的显示器支持 P3 色彩空间，它可以产生比 sRGB 更丰富，更饱和的颜色。<br><img src="/images/15052865582166.jpg" alt=""></p>
+<p>可以使用 wide color 来增强视觉体验。 它可以让照片和视频更加逼真生动。更多内容可以参考<a href="https://developer.apple.com/ios/human-interface-guidelines/visual-design/color/#color-management" target="_blank" rel="noopener">color management</a></p>
+<h2 id="手势"><a href="#手势" class="headerlink" title="手势"></a>手势</h2><p>想必大家都在发布会上看到了，iPhone X 上的显示屏可以使用屏幕边缘手势来访问主屏幕，应用程序切换器，通知中心和控制中心。适应这个新变化的同时，对于开发者要特别注意：<br><strong>避免干扰系统范围的屏幕边缘手势</strong>:用户依赖这些手势在每个 App 中操作，所以在极少数情况下，比如游戏这种强调沉浸式体验的 App 可能需要自定义的屏幕边缘手势，优先级高于系统的手势。 这种行为（称为边缘保护）应该谨慎使用，因为它使得用户难以访问系统级的操作。更多内容参考<a href="https://developer.apple.com/ios/human-interface-guidelines/user-interaction/gestures/" target="_blank" rel="noopener">gestures</a></p>
+<h2 id="补充的注意事项"><a href="#补充的注意事项" class="headerlink" title="补充的注意事项"></a>补充的注意事项</h2><ol>
+<li><strong>认证方法准确</strong>:iPhone X 支持 Face ID进行身份验证。 如果你的 App 集成了 Apple Pay 或其他系统身份验证功能，请务必注意不要在 iPhone X 上引用 Touch ID。同样地，也请确保不要在支持Touch ID 的设备上引用 Face ID。更详细的内容请参考<a href="https://developer.apple.com/ios/human-interface-guidelines/user-interaction/authentication/" target="_blank" rel="noopener">authentication</a></li>
+<li><strong>不要重复增加系统提供的键盘功能</strong>:在 iPhone X上，即使使用自定义键盘，Emoji / Globe 按钮和 Dictation 按钮也自动显示在键盘的下方。 你的 App 不能影响这些按钮，因此避免在键盘中重复增加这些按钮造成混乱。更详细内容请参阅<a href="https://developer.apple.com/ios/human-interface-guidelines/extensions/custom-keyboards/" target="_blank" rel="noopener">custom-keyboards</a></li>
+</ol>
+<hr>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>以上就是本节（Session 204）的主要内容了，同时特别补充了 iPhone X 最新的相关内容。对我个人而言，导航栏更醒目的标题的新 UI 风格，还需要再适应下，但至少搜索框的整合，给我们提供了更多的方便。本节大量篇幅涉及到的安全区域概念，或许会在以后的开发中，特别是使用 Autolayout 的童鞋们，产生深远的影响。在昂贵的 iPhone X 还没开放预售的此时此刻，我觉得最刺激的应该是先去玩玩模拟器啦！好啦，我已经迫不及待要在自己的 App 中实现惊艳的滑动效果啦~</p>
+<hr>
+<p>【参考及扩展阅读】</p>
+<p><a href="https://developer.apple.com/documentation/uikit/uitableview/1614851-separatorinset" target="_blank" rel="noopener">UITableView 的 separator inset</a><br><a href="https://developer.apple.com/documentation/uikit/uiview/1622566-layoutmargins" target="_blank" rel="noopener">UIView 的 layout margins</a><br><a href="https://blog.clubhouse.io/wwdc-2017-and-what-it-means-for-developers-76c5e5736fb8" target="_blank" rel="noopener">WWDC 2017 and What It Means For Developers</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WWDC/" rel="tag">#WWDC</a>
+          
+            <a href="/tags/iOS-11/" rel="tag">#iOS 11</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/%E8%BF%99%E4%B9%88%E8%BF%91%E9%82%A3%E4%B9%88%E8%BF%9C-%E6%AF%95%E4%B8%9A%E4%B8%A4%E5%91%A8%E5%B9%B4%E5%B0%8F%E8%AE%B0/" rel="next" title="这么近那么远 - 毕业两周年小记">
+                <i class="fa fa-chevron-left"></i> 这么近那么远 - 毕业两周年小记
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/Flux-%E6%9E%B6%E6%9E%84%E5%9C%A8%E6%92%AD%E6%94%BE%E5%99%A8%E8%A7%A3%E8%80%A6%E4%B8%AD%E7%9A%84%E5%AE%9E%E8%B7%B5/" rel="prev" title="Flux 架构在播放器解耦中的实践">
+                Flux 架构在播放器解耦中的实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="为-iOS-11-更新你的App-WWDC-2017-Session-204/"
+           data-title="为你的 App 适配 iOS 11 - WWDC 2017 Session 204" data-url="http://thinker-lj.github.io/%E4%B8%BA-iOS-11-%E6%9B%B4%E6%96%B0%E4%BD%A0%E7%9A%84App-WWDC-2017-Session-204/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/logo.png"
+               alt="thinker-lj" />
+          <p class="site-author-name" itemprop="name">thinker-lj</p>
+          <p class="site-description motion-element" itemprop="description">一个很会写代码的伪文艺青年</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">35</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-引子"><span class="nav-number">1.</span> <span class="nav-text">&amp; 引子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-适配-UIKit’s-Bars带来的新功能"><span class="nav-number">2.</span> <span class="nav-text">&amp; 适配 UIKit’s Bars带来的新功能</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-UIBarItem"><span class="nav-number">2.1.</span> <span class="nav-text">&amp;&amp; UIBarItem</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-大标题显示的控制"><span class="nav-number">2.2.</span> <span class="nav-text">&amp;&amp; 大标题显示的控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-Navigation-集成-UISearchController"><span class="nav-number">2.3.</span> <span class="nav-text">&amp;&amp; Navigation 集成 UISearchController</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-UINavigationController-滚动交互"><span class="nav-number">2.4.</span> <span class="nav-text">&amp;&amp; UINavigationController 滚动交互</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-UIToolbar-and-UINavigationBar-—-Layout"><span class="nav-number">2.5.</span> <span class="nav-text">&amp;&amp; UIToolbar and UINavigationBar — Layout</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-Margins-and-Insets"><span class="nav-number">3.</span> <span class="nav-text">&amp; Margins and Insets</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-layoutMargins"><span class="nav-number">3.1.</span> <span class="nav-text">&amp;&amp; layoutMargins</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-安全区域-Safe-Area"><span class="nav-number">3.2.</span> <span class="nav-text">&amp;&amp; 安全区域(Safe Area)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#amp-UIScrollView-和-UITableView-的新特性"><span class="nav-number">4.</span> <span class="nav-text">&amp; UIScrollView 和 UITableView 的新特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-Scroll-View"><span class="nav-number">4.1.</span> <span class="nav-text">&amp;&amp; Scroll View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#amp-amp-Table-Views"><span class="nav-number">4.2.</span> <span class="nav-text">&amp;&amp; Table Views</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#amp-amp-amp-默认启用-Self-Sizing"><span class="nav-number">4.2.1.</span> <span class="nav-text">&amp;&amp;&amp; 默认启用 Self-Sizing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#amp-amp-amp-separatorInset-扩展"><span class="nav-number">4.2.2.</span> <span class="nav-text">&amp;&amp;&amp; separatorInset 扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#amp-amp-amp-Table-Views-和-安全区域"><span class="nav-number">4.2.3.</span> <span class="nav-text">&amp;&amp;&amp; Table Views 和 安全区域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#amp-amp-amp-滑动操作-Swipe-Actions"><span class="nav-number">4.2.4.</span> <span class="nav-text">&amp;&amp;&amp; 滑动操作(Swipe Actions)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#iPhone-X-适配"><span class="nav-number">5.</span> <span class="nav-text">iPhone X 适配</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#屏幕大小"><span class="nav-number">5.1.</span> <span class="nav-text">屏幕大小</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#布局"><span class="nav-number">5.2.</span> <span class="nav-text">布局</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#色彩"><span class="nav-number">5.3.</span> <span class="nav-text">色彩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#手势"><span class="nav-number">5.4.</span> <span class="nav-text">手势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补充的注意事项"><span class="nav-number">5.5.</span> <span class="nav-text">补充的注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最后"><span class="nav-number">6.</span> <span class="nav-text">最后</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">thinker-lj</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"thinker-lj"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
