@@ -252,6 +252,165 @@
             
               
                 
+                <a class="post-title-link" href="/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BSDWebImage/" itemprop="url">
+                  源码解析之SDWebImage
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-26T15:02:53+08:00" content="2016-05-26">
+              2016-05-26
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" itemprop="url" rel="index">
+                    <span itemprop="name">源码解析</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BSDWebImage/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="源码解析之SDWebImage/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>Asynchronous image downloader with cache support as a UIImageView category</p>
+</blockquote>
+<hr>
+<h1 id="amp-引子"><a href="#amp-引子" class="headerlink" title="&amp; 引子"></a>&amp; 引子</h1><p>“一个支持缓存的异步下载图片的UIImageView分类”,这是SDWebImage官方的相当保守的自我描述；<br>看完下图，就可以了解作者有多么的谦虚；<br>下图我旨在表现SDWebImage的清晰的模块划分和任务分级策略，并不能全面的涵盖它的一切。<br><img src="/images/14695977227412.jpg" alt="SDWebImage 模块划分与任务分级"></p>
+<p>从标题就可以知晓，如果你只是想了解SDWebImage的用法，那最好直接去看<a href="https://github.com/rs/SDWebImage/blob/master/README.md" target="_blank" rel="noopener">README.md</a>;<br>下面我会按照任务分级和模块划分，从以下几个方面抽丝剥茧：</p>
+<hr>
+<h1 id="amp-Cache-缓存管理"><a href="#amp-Cache-缓存管理" class="headerlink" title="&amp; Cache -缓存管理"></a>&amp; Cache -缓存管理</h1><p>内存缓存和磁盘都由<strong>SDImageCache</strong>处理，即有关图片缓存的一切，都封装在这个类里了；</p>
+<h2 id="amp-amp-一-整体流程"><a href="#amp-amp-一-整体流程" class="headerlink" title="&amp;&amp; 一 整体流程"></a>&amp;&amp; 一 整体流程</h2><ul>
+<li>缓存命中流程：<ol>
+<li>通过外部传入的key，首先检查是否命中内存缓存，命中则直接返回；</li>
+<li>检查是否命中磁盘缓存，未命中则返回；</li>
+<li>命中磁盘缓存，检查是否开启内存缓存，开启则设置内存缓存，并返回命中结果；</li>
+</ol>
+</li>
+</ul>
+<h2 id="amp-amp-二-内存缓存"><a href="#amp-amp-二-内存缓存" class="headerlink" title="&amp;&amp; 二 内存缓存"></a>&amp;&amp; 二 内存缓存</h2><p>先来说内存缓存，就像<a href="https://github.com/AFNetworking/AFNetworking" target="_blank" rel="noopener">AFN</a>作者所说，<a href="http://nshipster.cn/nscache/" target="_blank" rel="noopener">NSCache</a>就可以处理一切你想要的了；SDImageCache内部的<strong>memCache</strong>是一个<strong>NSCache</strong>对象，因此直接通过<strong>- setObject:forKey:</strong>就可以设置缓存，但是作者使用了<strong>- setObject:forKey:cost:</strong>，用意是通过<strong>const</strong>来向系统传递单一缓存大小，从而通过系统对整个缓存大小的控制，有效控制整个缓存的容量。但是，这就是NSCache最坑的地方，你永远也无法知道，当缓存到达你设置的临界时，到底是哪部分缓存被清除了（清除也有可能不是立即进行的）。瑕不掩瑜吧，看来作者也并没因此放弃对NSCache的使用。另外，提到const，作者提供了一个计算图片大小的方法，很精简，直接贴出来：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FOUNDATION_STATIC_INLINE <span class="built_in">NSUInteger</span> SDCacheCostForImage(<span class="built_in">UIImage</span> *image) &#123;</span><br><span class="line">    <span class="keyword">return</span> image.size.height * image.size.width * image.scale * image.scale;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 其实这个方法计算出来的并不是图片所占字节数，而是像素点，SDWebImage官方也在<a href="https://github.com/rs/SDWebImage/issues/1369" target="_blank" rel="noopener">此处</a>进行了说明；所以，如果要计算图片所占的大小，可以这样做：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 延续作者的思路</span></span><br><span class="line">image.size.height * image.size.width * image.scale * image.scale * <span class="built_in">CGImageGetBitsPerPixel</span>(image.CGImage) / CHAR_BIT</span><br><span class="line"><span class="comment">// 更简洁的方式</span></span><br><span class="line"><span class="built_in">CGImageGetBytesPerRow</span>(image.CGImage) * <span class="built_in">CGImageGetHeight</span>(image.CGImage)</span><br></pre></td></tr></table></figure>
+<p>以上都是题外话，因为这个计算方法只用在了内存缓存，上面也提到了NSCache的坑，所以此处，这个值也就无所谓了。<br>另外，关于内存缓存删除的触发，除了NSCache的自动处理外（这部分毕竟是不可控的），作者还监听了<strong>UIApplicationDidReceiveMemoryWarningNotification</strong>做了更加保险的处理。</p>
+<h2 id="amp-amp-三-磁盘缓存"><a href="#amp-amp-三-磁盘缓存" class="headerlink" title="&amp;&amp; 三  磁盘缓存"></a>&amp;&amp; 三  磁盘缓存</h2><p>较之内存缓存成熟的NSCache方案，磁盘缓存要相对复杂一些了；<br>因为作者旨在实现的是一个图片缓存管理，相对来说，图片属于大容量对象存储。因此，这里作者直接使用文件存储这种方式，而不是像其他缓存策略那样，数据库和文件并用，也是合理的。</p>
+<ol>
+<li><p>存储<br> 存储部分，剖去外层一系列的判断，最终会调用下面的方法：  </p>
+ <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">void</span>)storeImageDataToDisk:(<span class="built_in">NSData</span> *)imageData forKey:(<span class="built_in">NSString</span> *)key &#123;</span><br><span class="line">    <span class="keyword">if</span> (!imageData) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (![_fileManager fileExistsAtPath:_diskCachePath]) &#123;</span><br><span class="line">        [_fileManager createDirectoryAtPath:_diskCachePath withIntermediateDirectories:<span class="literal">YES</span> attributes:<span class="literal">nil</span> error:<span class="literal">NULL</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// get cache Path for image key</span></span><br><span class="line">    <span class="built_in">NSString</span> *cachePathForKey = [<span class="keyword">self</span> defaultCachePathForKey:key];</span><br><span class="line">    <span class="comment">// transform to NSUrl</span></span><br><span class="line">    <span class="built_in">NSURL</span> *fileURL = [<span class="built_in">NSURL</span> fileURLWithPath:cachePathForKey];</span><br><span class="line">    [_fileManager createFileAtPath:cachePathForKey contents:imageData attributes:<span class="literal">nil</span>];</span><br><span class="line">    <span class="comment">// disable iCloud backup</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>.shouldDisableiCloud) &#123;</span><br><span class="line">        [fileURL setResourceValue:[<span class="built_in">NSNumber</span> numberWithBool:<span class="literal">YES</span>] forKey:<span class="built_in">NSURLIsExcludedFromBackupKey</span> error:<span class="literal">nil</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 贴出这个方法，是为了说明，作者并没有在每次的磁盘缓存中去做缓存容量和时间的判断，而是很粗暴的进行了文件存储。<br> 为什么会这么做？所有对磁盘缓存的操作，都放在了<strong>ioQueue</strong>这个串行队列中，试想，如果每次存储都做缓存时效和空间大小的判断和处理，那这个存储效率就太低了，同时缓存的维护代价会变得非常大。当然，外部设置的缓存时效和空间限制也并不是形同虚设，稍后会在缓存清理中做解释。</p>
+</li>
+<li><p>缓存清理<br>先解释上面的问题，缓存清理会在应用进入后台和应用即将被终止时进行。<br>因为作者监听了<strong>UIApplicationDidEnterBackgroundNotification</strong> 和 <strong>UIApplicationWillTerminateNotification</strong>这两个通知。<br>这两个通知，最终都会调用<strong>cleanDiskWithCompletionBlock</strong>方法，这个方法是整个缓存管理类营养价值最高的地方。由于代码量过大，这里就不贴出来了。下面提几个关键点：</p>
+<ul>
+<li>缓存清除策略:时间维度(优先考虑过期时间)和空间维度(LRU逐步衰减)；</li>
+<li>清理工作不会立即进行，考虑I/O阻塞和数组遍历修改易crash等因素，待清除对象最后统一处理。</li>
+<li>采用LRU,而非LFU的原因：文件缓存天然具有修改时间监控优势，这种实现方式维护成本更低。</li>
+</ul>
+</li>
+</ol>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8BSDWebImage/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+      
+    
+      
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/NSURLProtocol/" itemprop="url">
                   你真的会用NSURLProtocol？
                 </a>
@@ -1103,7 +1262,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-count">22</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
